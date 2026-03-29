@@ -100,7 +100,7 @@ a { text-decoration: none; color: inherit; }
 .nav--scrolled .nav__burger span { background: var(--dark); }
 .nav__inner { display: flex; align-items: center; gap: 24px; }
 .nav__logo { display: flex; align-items: center; gap: 10px; }
-.nav__logo-img { height: 44px; border-radius: 50%; }
+.nav__logo-img { height: 56px; border-radius: 0; }
 .nav__logo-fallback {
   display: none; align-items: center; gap: 8px;
   font-family: 'Fredoka One', cursive; font-size: 1.2rem; color: white;
