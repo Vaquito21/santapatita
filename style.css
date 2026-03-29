@@ -130,7 +130,7 @@ a { text-decoration: none; color: inherit; }
   position: relative; z-index: 1;
   display: grid; grid-template-columns: 1fr 1fr;
   gap: 48px; align-items: center;
-  padding: 60px 40px 80px 20px;
+  padding: 60px 40px 80px 10px;
 }
 .hero__tag {
   display: inline-block; background: rgba(255,255,255,.25);
