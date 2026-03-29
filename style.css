@@ -92,12 +92,12 @@ a { text-decoration: none; color: inherit; }
   padding: 16px 0; transition: var(--t);
 }
 .nav--scrolled {
-  background: rgba(255,255,255,.96); backdrop-filter: blur(16px);
-  box-shadow: 0 2px 20px rgba(37,150,228,.2); padding: 10px 0;
+  background: rgba(37,150,228,.97); backdrop-filter: blur(16px);
+  box-shadow: 0 2px 20px rgba(37,150,228,.3); padding: 10px 0;
 }
-.nav--scrolled .nav__links a { color: var(--text); }
-.nav--scrolled .nav__links a:hover { color: var(--sky-d); }
-.nav--scrolled .nav__burger span { background: var(--dark); }
+.nav--scrolled .nav__links a { color: rgba(255,255,255,.9); }
+.nav--scrolled .nav__links a:hover { color: var(--yellow); }
+.nav--scrolled .nav__burger span { background: white; }
 .nav__inner { display: flex; align-items: center; gap: 24px; position: relative; }
 .nav__logo { display: flex; align-items: center; gap: 10px; }
 .nav__logo-img { height: 56px; border-radius: 0; }
@@ -105,7 +105,7 @@ a { text-decoration: none; color: inherit; }
   display: none; align-items: center; gap: 8px;
   font-family: 'Fredoka One', cursive; font-size: 1.2rem; color: white;
 }
-.nav--scrolled .nav__logo-fallback { color: var(--dark); }
+.nav--scrolled .nav__logo-fallback { color: white; }
 .logo-halo { font-size: 1.8rem; }
 .nav__links { display: flex; list-style: none; gap: 28px; position: absolute; left: 50%; transform: translateX(-50%); }
 .nav__links a { color: rgba(255,255,255,.9); font-family: 'Poppins', sans-serif; font-weight: 700; font-size: 15px; transition: color var(--t); }
@@ -115,8 +115,8 @@ a { text-decoration: none; color: inherit; }
 .nav__icons { display: flex; align-items: center; gap: 16px; margin-left: auto; }
 .nav__icon-btn { position: relative; background: none; border: none; cursor: pointer; color: rgba(255,255,255,.9); display: flex; align-items: center; justify-content: center; padding: 4px; transition: color var(--t); }
 .nav__icon-btn:hover { color: var(--yellow); }
-.nav--scrolled .nav__icon-btn { color: var(--dark); }
-.nav--scrolled .nav__icon-btn:hover { color: var(--sky-d); }
+.nav--scrolled .nav__icon-btn { color: rgba(255,255,255,.9); }
+.nav--scrolled .nav__icon-btn:hover { color: var(--yellow); }
 .nav__cart-badge { position: absolute; top: -6px; right: -8px; background: var(--dark); color: white; font-size: .65rem; font-weight: 800; width: 18px; height: 18px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
 .nav--scrolled .nav__cart-badge { background: var(--dark); }
 
