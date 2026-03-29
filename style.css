@@ -39,7 +39,7 @@ img { max-width: 100%; display: block; }
 a { text-decoration: none; color: inherit; }
 
 /* ── Container ── */
-.container { max-width: 1160px; margin: 0 auto; padding: 0 24px; }
+.container { max-width: 1600px; margin: 0 auto; padding: 0 40px; }
 
 /* ── Buttons ── */
 .btn {
