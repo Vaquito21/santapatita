@@ -145,7 +145,7 @@ a { text-decoration: none; color: inherit; }
   color: #3d3d3d; line-height: 1.15; margin-bottom: 20px;
 }
 .hero__title em { color: white; font-style: normal; }
-.hero__sub { font-size: 1.05rem; color: rgba(26,26,46,.8); margin-bottom: 28px; line-height: 1.7; }
+.hero__sub { font-size: 28px; color: rgba(26,26,46,.8); margin-bottom: 28px; line-height: 1.7; }
 .hero__badges { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 36px; }
 .badge {
   background: rgba(255,255,255,.35); backdrop-filter: blur(8px);
