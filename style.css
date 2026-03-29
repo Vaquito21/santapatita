@@ -123,7 +123,7 @@ a { text-decoration: none; color: inherit; }
 /* ═══════════════════════════════════════════ HERO ══ */
 .hero {
   position: relative; min-height: 100vh;
-  background: linear-gradient(160deg, #4BBCE8 0%, #6FD3F5 40%, #A8E8F8 100%);
+  background: linear-gradient(160deg, #2596e4 0%, #3aaee8 40%, #6dc8f0 100%);
   display: flex; align-items: center; overflow: hidden; padding-top: 80px;
 }
 .hero__inner {
