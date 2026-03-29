@@ -141,7 +141,7 @@ a { text-decoration: none; color: inherit; }
 .hero__title {
   font-family: 'Fredoka One', cursive;
   font-size: clamp(2.5rem, 5vw, 4rem);
-  color: var(--dark); line-height: 1.15; margin-bottom: 20px; margin-left: 60px;
+  color: var(--dark); line-height: 1.15; margin-bottom: 20px;
 }
 .hero__title em { color: white; font-style: normal; }
 .hero__sub { font-size: 1.05rem; color: rgba(26,26,46,.8); margin-bottom: 28px; line-height: 1.7; }
