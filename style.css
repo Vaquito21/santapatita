@@ -6,9 +6,9 @@
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
-  --sky:     #5BC8F0;
-  --sky-d:   #3AAFD8;
-  --sky-l:   #EAF8FF;
+  --sky:     #2596e4;
+  --sky-d:   #1a7abf;
+  --sky-l:   #daeefb;
   --yellow:  #F7C618;
   --yellow-d:#E0B015;
   --dark:    #1A1A2E;
