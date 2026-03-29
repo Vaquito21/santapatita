@@ -89,7 +89,7 @@ a { text-decoration: none; color: inherit; }
 /* ═══════════════════════════════════════════ NAV ══ */
 .nav {
   position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
-  padding: 16px 0; transition: var(--t);
+  padding: 10px 0; transition: var(--t);
 }
 .nav--scrolled {
   background: rgba(37,150,228,.97); backdrop-filter: blur(16px);
@@ -100,7 +100,7 @@ a { text-decoration: none; color: inherit; }
 .nav--scrolled .nav__burger span { background: white; }
 .nav__inner { display: flex; align-items: center; gap: 24px; position: relative; }
 .nav__logo { display: flex; align-items: center; gap: 10px; }
-.nav__logo-img { height: 80px; border-radius: 0; }
+.nav__logo-img { height: 60px; border-radius: 0; }
 .nav__logo-fallback {
   display: none; align-items: center; gap: 8px;
   font-family: 'Fredoka One', cursive; font-size: 1.2rem; color: white;
