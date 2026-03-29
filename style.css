@@ -139,9 +139,10 @@ a { text-decoration: none; color: inherit; }
   color: var(--dark); letter-spacing: .04em; margin-bottom: 20px;
 }
 .hero__title {
-  font-family: 'Fredoka One', cursive;
+  font-family: 'Poppins', sans-serif;
+  font-weight: 600;
   font-size: clamp(2.5rem, 5vw, 4rem);
-  color: var(--dark); line-height: 1.15; margin-bottom: 20px;
+  color: #4A3235; line-height: 1.15; margin-bottom: 20px;
 }
 .hero__title em { color: white; font-style: normal; }
 .hero__sub { font-size: 1.05rem; color: rgba(26,26,46,.8); margin-bottom: 28px; line-height: 1.7; }
