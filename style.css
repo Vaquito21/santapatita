@@ -94,7 +94,7 @@ a { text-decoration: none; color: inherit; }
   font-family: 'Poppins', sans-serif; font-size: .8rem; font-weight: 600;
   letter-spacing: .08em;
 }
-.announcement-bar__link { color: white; text-decoration: underline; }
+.announcement-bar__link { color: white; text-decoration: none; }
 .announcement-bar__link:hover { opacity: .8; }
 
 /* ═══════════════════════════════════════════ NAV ══ */
