@@ -124,17 +124,14 @@ a { text-decoration: none; color: inherit; }
 .nav__dropdown { position: relative; }
 .nav__dropdown-menu {
   display: none;
-  position: absolute;
-  top: 100%;
-  left: 50%;
-  transform: translateX(-50%);
+  position: fixed;
   background: #fff;
   border-radius: 12px;
-  box-shadow: 0 8px 24px rgba(0,0,0,.12);
+  box-shadow: 0 8px 24px rgba(0,0,0,.15);
   list-style: none;
-  padding: 16px 0 8px;
+  padding: 8px 0;
   min-width: 200px;
-  z-index: 100;
+  z-index: 9999;
 }
 .nav__dropdown-menu li a {
   display: block;

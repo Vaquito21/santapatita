@@ -649,8 +649,16 @@ document.querySelectorAll('.benefit-card,.store-card,.delivery-box,.flavor-card,
 <script>
 const nosotrosDropdown = document.querySelector('.nav__dropdown');
 const nosotrosMenu = document.getElementById('nosotrosMenu');
-nosotrosDropdown.addEventListener('mouseenter', function() { nosotrosMenu.classList.add('open'); });
-nosotrosDropdown.addEventListener('mouseleave', function() { nosotrosMenu.classList.remove('open'); });
+nosotrosDropdown.addEventListener('mouseenter', function() {
+  const rect = nosotrosDropdown.getBoundingClientRect();
+  nosotrosMenu.style.display = 'block';
+  nosotrosMenu.style.top = rect.bottom + 8 + 'px';
+  nosotrosMenu.style.left = (rect.left + rect.width / 2) + 'px';
+  nosotrosMenu.style.transform = 'translateX(-50%)';
+});
+nosotrosDropdown.addEventListener('mouseleave', function() {
+  nosotrosMenu.style.display = 'none';
+});
 const historiaBtn = document.getElementById('historiaBtn');
 const historiaModal = document.getElementById('historiaModal');
 const historiaClose = document.getElementById('historiaClose');
