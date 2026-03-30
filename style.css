@@ -209,7 +209,7 @@ a { text-decoration: none; color: inherit; }
 .section__header { text-align: center; max-width: 600px; margin: 0 auto 56px; }
 .section__tag {
   display: block; font-size: 2rem; font-weight: 900; white-space: nowrap;
-  text-transform: uppercase; letter-spacing: .14em;
+  text-transform: uppercase; letter-spacing: .02em;
   color: var(--sky-d); margin-bottom: 10px;
 }
 .section__title {
