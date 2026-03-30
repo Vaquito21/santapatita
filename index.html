@@ -34,8 +34,8 @@
       <li><a href="#productos">Tienda</a></li>
       <li><a href="#suscripcion">Suscripción</a></li>
       <li class="nav__dropdown">
-        <a href="#beneficios">Nosotros ▾</a>
-        <ul class="nav__dropdown-menu">
+        <a href="#beneficios" id="nosotrosBtn">Nosotros ▾</a>
+        <ul class="nav__dropdown-menu" id="nosotrosMenu">
           <li><a href="#historia">Historia</a></li>
           <li><a href="#equipo">Equipo</a></li>
           <li><a href="#testimonios">Testimonios</a></li>
@@ -602,6 +602,19 @@ document.querySelectorAll('a[href^="#"]').forEach(a => {
 // ── Animate on scroll ──
 const io = new IntersectionObserver(entries => entries.forEach(e => { if(e.isIntersecting) e.target.classList.add('visible'); }), {threshold:.1});
 document.querySelectorAll('.benefit-card,.store-card,.delivery-box,.flavor-card,.size-card').forEach(el => io.observe(el));
+</script>
+<script>
+const nosotrosBtn = document.getElementById('nosotrosBtn');
+const nosotrosMenu = document.getElementById('nosotrosMenu');
+nosotrosBtn.addEventListener('click', function(e) {
+  e.preventDefault();
+  nosotrosMenu.classList.toggle('open');
+});
+document.addEventListener('click', function(e) {
+  if (!e.target.closest('.nav__dropdown')) {
+    nosotrosMenu.classList.remove('open');
+  }
+});
 </script>
 </body>
 </html>
