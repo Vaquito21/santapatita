@@ -167,12 +167,9 @@ a { text-decoration: none; color: inherit; }
   position: absolute; font-size: 2rem;
   animation: floatBubble 3s ease-in-out infinite;
 }
-.paw-float-img { width: 80px; height: 80px; object-fit: contain; filter: drop-shadow(0 4px 8px rgba(0,0,0,.15)); }
-.mascot-float-1 { top: 8%; right: 8%; animation-delay: 0s; }
-.mascot-float-2 { bottom: 15%; left: 8%; animation-delay: 1s; }
-.mascot-float-3 { top: 50%; right: 2%; animation-delay: 2s; }
-.mascot-float-4 { top: 20%; left: 35%; animation-delay: 0.5s; }
-.mascot-float-5 { bottom: 10%; right: 30%; animation-delay: 1.5s; }
+.mascot-float-1 { top: 10%; right: 5%; animation-delay: 0s; }
+.mascot-float-2 { bottom: 20%; left: 5%; animation-delay: 1s; }
+.mascot-float-3 { top: 40%; right: -5%; animation-delay: 2s; }
 @keyframes floatBubble { 0%,100% { transform: translateY(0) rotate(0deg); } 50% { transform: translateY(-12px) rotate(10deg); } }
 .hero__wave { position: absolute; bottom: -2px; left: 0; right: 0; }
 .hero__wave svg { display: block; width: 100%; height: 60px; }
