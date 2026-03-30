@@ -184,7 +184,7 @@ a { text-decoration: none; color: inherit; }
 .mascot-float-3 { top: 40%; right: -5%; animation-delay: 2s; }
 @keyframes floatBubble { 0%,100% { transform: translateY(0) rotate(0deg); } 50% { transform: translateY(-12px) rotate(10deg); } }
 .hero__paws { position: absolute; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
-.hp { position: absolute; width: 2rem; height: 2rem; object-fit: contain; mix-blend-mode: multiply; animation: floatBubble 3s ease-in-out infinite; opacity: 0.85; }
+.hp { position: absolute; width: 4rem; height: 4rem; object-fit: contain; mix-blend-mode: multiply; animation: floatBubble 3s ease-in-out infinite; opacity: 0.85; }
 .hp-1  { top: 6%;  left: 2%;   animation-delay: 0s; }
 .hp-2  { top: 14%; left: 18%;  animation-delay: 0.4s; }
 .hp-3  { top: 4%;  left: 35%;  animation-delay: 0.8s; }
