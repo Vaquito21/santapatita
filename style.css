@@ -100,7 +100,7 @@ a { text-decoration: none; color: inherit; }
 /* ═══════════════════════════════════════════ NAV ══ */
 .nav {
   position: fixed; top: 36px; left: 0; right: 0; z-index: 1000;
-  padding: 10px 0; transition: var(--t);
+  padding: 10px 0; transition: var(--t); overflow: visible;
 }
 .nav--scrolled {
   background: rgba(37,150,228,.97); backdrop-filter: blur(16px);
