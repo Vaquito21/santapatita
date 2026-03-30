@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Tienda — Santa Patita</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800;900&family=Poppins:wght@400;600;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="style.css?v=4"/>
+  <style>
+    .page-hero { background:linear-gradient(160deg,#2596e4 0%,#3aaee8 40%,#6dc8f0 100%); padding:160px 0 80px; text-align:center; position:relative; overflow:hidden; }
+    .page-hero h1 { font-family:'Poppins',sans-serif; font-size:clamp(2rem,5vw,3.5rem); font-weight:700; color:#3d3d3d; margin-bottom:12px; }
+    .page-hero p { font-size:1.1rem; color:rgba(255,255,255,.9); max-width:500px; margin:0 auto; }
+    .page-hero__wave { position:absolute; bottom:-2px; left:0; right:0; }
+    .page-hero__wave svg { display:block; width:100%; height:60px; }
+  </style>
+</head>
+<body>
+<div class="announcement-bar">ENVÍO GRATIS LOS DOMINGOS DESDE S/ 17. CONSULTA LA COBERTURA <a href="/#delivery" class="announcement-bar__link"><span style="text-decoration:underline">AQUÍ</span></a></div>
+<nav class="nav" id="nav">
+  <div class="container nav__inner">
+    <a href="/" class="nav__logo"><img src="logo.png" alt="Santa Patita" class="nav__logo-img"/></a>
+    <ul class="nav__links">
+      <li><a href="/tienda" style="color:var(--sky-d)">Tienda</a></li>
+      <li><a href="/suscripcion">Suscripción</a></li>
+      <li><a href="/nosotros">Nosotros</a></li>
+      <li><a href="/#puntos">Puntos de Venta</a></li>
+      <li><a href="/#delivery">Contáctanos</a></li>
+    </ul>
+    <div class="nav__icons">
+      <button class="nav__icon-btn" title="Buscar"><svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></button>
+      <button class="nav__icon-btn" title="Mi cuenta"><svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></button>
+      <button class="nav__icon-btn nav__icon-btn--cart" title="Carrito"><svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg><span class="nav__cart-badge">0</span></button>
+    </div>
+  </div>
+</nav>
+
+<section class="page-hero">
+  <div class="container">
+    <h1>Tienda 🛍️</h1>
+    <p>Gomitas de colágeno artesanal para tu peludito. 100% natural, hecho en Lima.</p>
+  </div>
+  <div class="page-hero__wave"><svg viewBox="0 0 1440 100" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none"><path d="M0,55 C360,95 1080,15 1440,55 L1440,100 L0,100 Z" fill="#fff"/></svg></div>
+</section>
+
+<section class="section" id="productos">
+  <div class="container">
+    <div class="section__header">
+      <p class="section__tag">Nuestros productos</p>
+    </div>
+    <p style="text-align:center;color:#666;font-size:1rem;margin-top:-30px;">Próximamente podrás comprar aquí directamente. Por ahora escríbenos por WhatsApp 🐾</p>
+    <div style="text-align:center;margin-top:40px;">
+      <a href="https://wa.me/51954172058" class="btn btn--yellow btn--lg" target="_blank">Pedir por WhatsApp 🐶</a>
+    </div>
+  </div>
+</section>
+
+<footer style="background:#3d3d3d;color:white;text-align:center;padding:32px;font-family:'Poppins',sans-serif;font-size:.9rem;">
+  <p>© 2025 Santa Patita · Hecho con 🐾 en Lima, Perú</p>
+  <p style="margin-top:8px;opacity:.7;">WhatsApp: <a href="https://wa.me/51954172058" style="color:white;">+51 954 172 058</a> · Instagram: <a href="https://instagram.com/santa.patita" style="color:white;">@santa.patita</a></p>
+</footer>
+<script>const nav=document.getElementById('nav');window.addEventListener('scroll',()=>{nav.classList.toggle('nav--scrolled',window.scrollY>10);});</script>
+</body>
+</html>

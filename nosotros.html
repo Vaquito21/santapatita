@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Nosotros — Santa Patita</title>
+  <meta name="description" content="Conoce la historia, el equipo y los valores detrás de Santa Patita, snacks de colágeno artesanal para mascotas en Lima, Perú."/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800;900&family=Poppins:wght@400;600;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="style.css?v=4"/>
+  <style>
+    .page-hero {
+      background: linear-gradient(160deg, #2596e4 0%, #3aaee8 40%, #6dc8f0 100%);
+      padding: 160px 0 80px;
+      text-align: center;
+      color: white;
+      position: relative;
+      overflow: hidden;
+    }
+    .page-hero h1 { font-family: 'Poppins', sans-serif; font-size: clamp(2rem,5vw,3.5rem); font-weight: 700; margin-bottom: 12px; color: #3d3d3d; }
+    .page-hero p { font-size: 1.1rem; color: rgba(255,255,255,.9); max-width: 500px; margin: 0 auto; }
+    .page-hero__wave { position: absolute; bottom: -2px; left: 0; right: 0; }
+    .page-hero__wave svg { display: block; width: 100%; height: 60px; }
+
+    /* HISTORIA */
+    .tl { position: relative; max-width: 750px; margin: 0 auto; padding: 0 20px; }
+    .tl::before { content:''; position:absolute; left:50%; transform:translateX(-50%); top:0; bottom:0; width:3px; background:linear-gradient(to bottom,var(--sky),var(--sky-l)); border-radius:2px; }
+    .tl__item { display:flex; margin-bottom:48px; position:relative; }
+    .tl__item:not(.tl__item--right) { justify-content:flex-start; padding-right:calc(50% + 28px); }
+    .tl__item--right { justify-content:flex-end; padding-left:calc(50% + 28px); }
+    .tl__dot { position:absolute; left:50%; transform:translateX(-50%); top:18px; width:16px; height:16px; border-radius:50%; background:var(--sky); border:3px solid #fff; box-shadow:0 0 0 3px var(--sky); z-index:1; }
+    .tl__card { background:#f8fbff; border-radius:16px; padding:22px 26px; border:1px solid #e0eef8; width:100%; box-shadow:0 4px 16px rgba(0,0,0,.06); }
+    .tl__year { display:inline-block; background:var(--sky); color:#fff; font-size:.72rem; font-weight:800; padding:3px 14px; border-radius:20px; margin-bottom:10px; }
+    .tl__card h3 { font-size:1.05rem; font-weight:800; color:var(--dark); margin-bottom:6px; }
+    .tl__card p { font-size:.88rem; color:#666; line-height:1.6; margin:0; }
+
+    /* EQUIPO */
+    .team-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:32px; max-width:700px; margin:0 auto; }
+    .team-card { background:#fff; border-radius:20px; padding:36px 28px; text-align:center; box-shadow:0 4px 20px rgba(0,0,0,.07); border:1px solid #f0f4f8; }
+    .team-card__avatar { font-size:4rem; margin-bottom:16px; }
+    .team-card h3 { font-size:1.1rem; font-weight:800; color:var(--dark); margin-bottom:4px; }
+    .team-card__role { font-size:.85rem; color:var(--sky-d); font-weight:700; margin-bottom:12px; }
+    .team-card p { font-size:.88rem; color:#666; line-height:1.6; }
+
+    /* VALORES */
+    .values-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:24px; }
+    .value-card { background:#fff; border-radius:16px; padding:28px 24px; text-align:center; box-shadow:0 4px 16px rgba(0,0,0,.06); border:1px solid #f0f4f8; }
+    .value-card__icon { font-size:2.5rem; margin-bottom:14px; }
+    .value-card h3 { font-size:1rem; font-weight:800; color:var(--dark); margin-bottom:8px; }
+    .value-card p { font-size:.85rem; color:#666; line-height:1.5; margin:0; }
+  </style>
+</head>
+<body>
+
+<!-- ═══ NAV ═══ -->
+<div class="announcement-bar">ENVÍO GRATIS LOS DOMINGOS DESDE S/ 17. CONSULTA LA COBERTURA <a href="/#delivery" class="announcement-bar__link"><span style="text-decoration:underline">AQUÍ</span></a></div>
+<nav class="nav" id="nav">
+  <div class="container nav__inner">
+    <a href="/" class="nav__logo">
+      <img src="logo.png" alt="Santa Patita" class="nav__logo-img"/>
+    </a>
+    <ul class="nav__links" id="navLinks">
+      <li><a href="/tienda">Tienda</a></li>
+      <li><a href="/suscripcion">Suscripción</a></li>
+      <li><a href="/nosotros" style="color:var(--sky-d)">Nosotros</a></li>
+      <li><a href="/#puntos">Puntos de Venta</a></li>
+      <li><a href="/#delivery">Contáctanos</a></li>
+    </ul>
+    <div class="nav__icons">
+      <button class="nav__icon-btn" title="Buscar">
+        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      </button>
+      <button class="nav__icon-btn" title="Mi cuenta">
+        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      </button>
+      <button class="nav__icon-btn nav__icon-btn--cart" title="Carrito">
+        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+        <span class="nav__cart-badge">0</span>
+      </button>
+    </div>
+  </div>
+</nav>
+
+<!-- ═══ HERO ═══ -->
+<section class="page-hero">
+  <div class="container">
+    <h1>Nosotros 🐾</h1>
+    <p>Dos personas, mucho amor y la misión de que cada peludito viva más fuerte.</p>
+  </div>
+  <div class="page-hero__wave">
+    <svg viewBox="0 0 1440 100" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+      <path d="M0,55 C360,95 1080,15 1440,55 L1440,100 L0,100 Z" fill="#fff"/>
+    </svg>
+  </div>
+</section>
+
+<!-- ═══ HISTORIA ═══ -->
+<section class="section" id="historia">
+  <div class="container">
+    <div class="section__header">
+      <p class="section__tag">Historia</p>
+      <h2 class="section__title" style="font-size:1.8rem;font-weight:800;">Cómo nació Santa Patita</h2>
+    </div>
+    <div class="tl">
+      <div class="tl__item">
+        <div class="tl__dot"></div>
+        <div class="tl__card">
+          <span class="tl__year">2025</span>
+          <h3>La idea</h3>
+          <p>Todo empezó con el amor por nuestras mascotas y la búsqueda de snacks naturales que realmente les hicieran bien.</p>
+        </div>
+      </div>
+      <div class="tl__item tl__item--right">
+        <div class="tl__dot"></div>
+        <div class="tl__card">
+          <span class="tl__year">2025</span>
+          <h3>Primeras gomitas</h3>
+          <p>Desarrollamos nuestra primera receta de colágeno artesanal. Meses de pruebas y muchas colas de perritos contentos.</p>
+        </div>
+      </div>
+      <div class="tl__item">
+        <div class="tl__dot"></div>
+        <div class="tl__card">
+          <span class="tl__year">2025</span>
+          <h3>Santa Patita nace oficialmente</h3>
+          <p>Lanzamos la marca y llegamos a nuestros primeros puntos físicos en Lima con mucho amor.</p>
+        </div>
+      </div>
+      <div class="tl__item tl__item--right">
+        <div class="tl__dot"></div>
+        <div class="tl__card">
+          <span class="tl__year">2026</span>
+          <h3>Seguimos creciendo</h3>
+          <p>4 sabores, 4 tiendas aliadas y cientos de peluditos felices. Cada huellita es un paso más fuerte. 🐾</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ EQUIPO ═══ -->
+<section class="section section--sky" id="equipo">
+  <div class="container">
+    <div class="section__header">
+      <p class="section__tag">Equipo</p>
+      <h2 class="section__title" style="font-size:1.8rem;font-weight:800;">Las personas detrás de las gomitas</h2>
+    </div>
+    <div class="team-grid">
+      <div class="team-card">
+        <div class="team-card__avatar">👩</div>
+        <h3>Daniella</h3>
+        <p class="team-card__role">Co-fundadora</p>
+        <p>La mente creativa detrás de la marca. Apasionada por el bienestar animal y los ingredientes naturales.</p>
+      </div>
+      <div class="team-card">
+        <div class="team-card__avatar">👨</div>
+        <h3>Co-fundador</h3>
+        <p class="team-card__role">Co-fundador</p>
+        <p>El motor operativo de Santa Patita. Se encarga de que cada gomita llegue perfecta a su destino.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ VALORES ═══ -->
+<section class="section" id="valores">
+  <div class="container">
+    <div class="section__header">
+      <p class="section__tag">Nuestros valores</p>
+      <h2 class="section__title" style="font-size:1.8rem;font-weight:800;">Lo que nos mueve cada día</h2>
+    </div>
+    <div class="values-grid">
+      <div class="value-card"><div class="value-card__icon">🌿</div><h3>Natural</h3><p>Solo ingredientes reales. Sin químicos, sin conservantes, sin atajos.</p></div>
+      <div class="value-card"><div class="value-card__icon">🐾</div><h3>Con propósito</h3><p>Cada gomita fortalece articulaciones, pelaje y piel de tu mascota.</p></div>
+      <div class="value-card"><div class="value-card__icon">💛</div><h3>Hecho con amor</h3><p>Producción artesanal en Lima. Cada lote con dedicación y cuidado.</p></div>
+      <div class="value-card"><div class="value-card__icon">🇵🇪</div><h3>Hecho en Perú</h3><p>Orgullosamente peruano. Apoyamos la economía local con cada compra.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ FOOTER ═══ -->
+<footer style="background:#3d3d3d;color:white;text-align:center;padding:32px;font-family:'Poppins',sans-serif;font-size:.9rem;">
+  <p>© 2025 Santa Patita · Hecho con 🐾 en Lima, Perú</p>
+  <p style="margin-top:8px;opacity:.7;">WhatsApp: <a href="https://wa.me/51954172058" style="color:white;">+51 954 172 058</a> · Instagram: <a href="https://instagram.com/santa.patita" style="color:white;">@santa.patita</a></p>
+</footer>
+
+<script>
+const nav = document.getElementById('nav');
+window.addEventListener('scroll', () => { nav.classList.toggle('nav--scrolled', window.scrollY > 10); });
+</script>
+</body>
+</html>
