@@ -33,15 +33,7 @@
     <ul class="nav__links" id="navLinks">
       <li><a href="#productos">Tienda</a></li>
       <li><a href="#suscripcion">Suscripción</a></li>
-      <li class="nav__dropdown">
-        <a href="#beneficios" id="nosotrosBtn">Nosotros ▾</a>
-        <ul class="nav__dropdown-menu" id="nosotrosMenu">
-          <li><a href="#" id="historiaBtn">Historia</a></li>
-          <li><a href="#equipo">Equipo</a></li>
-          <li><a href="#testimonios">Testimonios</a></li>
-          <li><a href="#faq">Preguntas Frecuentes</a></li>
-        </ul>
-      </li>
+      <li><a href="#beneficios" id="nosotrosBtn">Nosotros ▾</a></li>
       <li><a href="#puntos">Puntos de Venta</a></li>
       <li><a href="#delivery">Contáctanos</a></li>
     </ul>
@@ -603,6 +595,14 @@ document.querySelectorAll('a[href^="#"]').forEach(a => {
 const io = new IntersectionObserver(entries => entries.forEach(e => { if(e.isIntersecting) e.target.classList.add('visible'); }), {threshold:.1});
 document.querySelectorAll('.benefit-card,.store-card,.delivery-box,.flavor-card,.size-card').forEach(el => io.observe(el));
 </script>
+<!-- ═══ NOSOTROS DROPDOWN ═══ -->
+<div id="nosotrosMenu" style="display:none;position:fixed;z-index:99999;background:#fff;border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,.18);list-style:none;padding:8px 0;min-width:200px;">
+  <a href="#" id="historiaBtn" style="display:block;padding:11px 20px;color:#3d3d3d;font-family:'Poppins',sans-serif;font-weight:600;font-size:14px;text-decoration:none;">Historia</a>
+  <a href="#equipo" style="display:block;padding:11px 20px;color:#3d3d3d;font-family:'Poppins',sans-serif;font-weight:600;font-size:14px;text-decoration:none;">Equipo</a>
+  <a href="#testimonios" style="display:block;padding:11px 20px;color:#3d3d3d;font-family:'Poppins',sans-serif;font-weight:600;font-size:14px;text-decoration:none;">Testimonios</a>
+  <a href="#faq" style="display:block;padding:11px 20px;color:#3d3d3d;font-family:'Poppins',sans-serif;font-weight:600;font-size:14px;text-decoration:none;">Preguntas Frecuentes</a>
+</div>
+
 <!-- ═══ MODAL HISTORIA ═══ -->
 <div class="modal-overlay" id="historiaModal">
   <div class="modal-box">
@@ -647,17 +647,20 @@ document.querySelectorAll('.benefit-card,.store-card,.delivery-box,.flavor-card,
 </div>
 
 <script>
-const nosotrosDropdown = document.querySelector('.nav__dropdown');
+const nosotrosBtn = document.getElementById('nosotrosBtn');
 const nosotrosMenu = document.getElementById('nosotrosMenu');
-nosotrosDropdown.addEventListener('mouseenter', function() {
-  const rect = nosotrosDropdown.getBoundingClientRect();
+nosotrosBtn.addEventListener('mouseenter', function() {
+  const rect = nosotrosBtn.getBoundingClientRect();
   nosotrosMenu.style.display = 'block';
-  nosotrosMenu.style.top = rect.bottom + 8 + 'px';
+  nosotrosMenu.style.top = (rect.bottom + 6) + 'px';
   nosotrosMenu.style.left = (rect.left + rect.width / 2) + 'px';
   nosotrosMenu.style.transform = 'translateX(-50%)';
 });
-nosotrosDropdown.addEventListener('mouseleave', function() {
-  nosotrosMenu.style.display = 'none';
+nosotrosBtn.addEventListener('mouseleave', function(e) {
+  if (!nosotrosMenu.contains(e.relatedTarget)) nosotrosMenu.style.display = 'none';
+});
+nosotrosMenu.addEventListener('mouseleave', function(e) {
+  if (!nosotrosBtn.contains(e.relatedTarget)) nosotrosMenu.style.display = 'none';
 });
 const historiaBtn = document.getElementById('historiaBtn');
 const historiaModal = document.getElementById('historiaModal');
