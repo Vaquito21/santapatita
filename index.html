@@ -36,7 +36,7 @@
       <li class="nav__dropdown">
         <a href="#beneficios" id="nosotrosBtn">Nosotros ▾</a>
         <ul class="nav__dropdown-menu" id="nosotrosMenu">
-          <li><a href="#historia">Historia</a></li>
+          <li><a href="#" id="historiaBtn">Historia</a></li>
           <li><a href="#equipo">Equipo</a></li>
           <li><a href="#testimonios">Testimonios</a></li>
           <li><a href="#faq">Preguntas Frecuentes</a></li>
@@ -603,6 +603,49 @@ document.querySelectorAll('a[href^="#"]').forEach(a => {
 const io = new IntersectionObserver(entries => entries.forEach(e => { if(e.isIntersecting) e.target.classList.add('visible'); }), {threshold:.1});
 document.querySelectorAll('.benefit-card,.store-card,.delivery-box,.flavor-card,.size-card').forEach(el => io.observe(el));
 </script>
+<!-- ═══ MODAL HISTORIA ═══ -->
+<div class="modal-overlay" id="historiaModal">
+  <div class="modal-box">
+    <button class="modal-close" id="historiaClose">✕</button>
+    <h2 class="modal-title">Nuestra Historia 🐾</h2>
+    <div class="tl">
+      <div class="tl__line"></div>
+      <div class="tl__item">
+        <div class="tl__dot"></div>
+        <div class="tl__card">
+          <span class="tl__year">2025</span>
+          <h3>El inicio</h3>
+          <p>Todo empezó con el amor por nuestras mascotas y la búsqueda de snacks naturales que realmente les hicieran bien.</p>
+        </div>
+      </div>
+      <div class="tl__item tl__item--right">
+        <div class="tl__dot"></div>
+        <div class="tl__card">
+          <span class="tl__year">2025</span>
+          <h3>Primeras gomitas</h3>
+          <p>Desarrollamos nuestra primera receta de colágeno artesanal. Meses de pruebas y muchas colas de perritos contentos.</p>
+        </div>
+      </div>
+      <div class="tl__item">
+        <div class="tl__dot"></div>
+        <div class="tl__card">
+          <span class="tl__year">2025</span>
+          <h3>Santa Patita nace oficialmente</h3>
+          <p>Lanzamos la marca y llegamos a nuestros primeros puntos físicos en Lima con mucho amor.</p>
+        </div>
+      </div>
+      <div class="tl__item tl__item--right">
+        <div class="tl__dot"></div>
+        <div class="tl__card">
+          <span class="tl__year">2026</span>
+          <h3>Seguimos creciendo</h3>
+          <p>4 sabores, 4 tiendas aliadas y cientos de peluditos felices. Cada huellita es un paso más fuerte. 🐾</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <script>
 const nosotrosBtn = document.getElementById('nosotrosBtn');
 const nosotrosMenu = document.getElementById('nosotrosMenu');
@@ -615,6 +658,16 @@ document.addEventListener('click', function(e) {
     nosotrosMenu.classList.remove('open');
   }
 });
+const historiaBtn = document.getElementById('historiaBtn');
+const historiaModal = document.getElementById('historiaModal');
+const historiaClose = document.getElementById('historiaClose');
+historiaBtn.addEventListener('click', function(e) {
+  e.preventDefault();
+  nosotrosMenu.classList.remove('open');
+  historiaModal.classList.add('open');
+});
+historiaClose.addEventListener('click', function() { historiaModal.classList.remove('open'); });
+historiaModal.addEventListener('click', function(e) { if(e.target === historiaModal) historiaModal.classList.remove('open'); });
 </script>
 </body>
 </html>
