@@ -118,21 +118,21 @@ a { text-decoration: none; color: inherit; }
 }
 .nav--scrolled .nav__logo-fallback { color: white; }
 .logo-halo { font-size: 1.8rem; }
-.nav__links { display: flex; list-style: none; gap: 28px; position: absolute; left: 50%; transform: translateX(-50%); }
+.nav__links { display: flex; list-style: none; gap: 28px; position: absolute; left: 50%; transform: translateX(-50%); overflow: visible; }
 .nav__links a { color: #3d3d3d; font-family: 'Poppins', sans-serif; font-weight: 700; font-size: 15px; transition: color var(--t); }
 .nav__links a:hover { color: var(--yellow); }
 .nav__dropdown { position: relative; }
 .nav__dropdown-menu {
   display: none;
   position: absolute;
-  top: calc(100% + 12px);
+  top: 100%;
   left: 50%;
   transform: translateX(-50%);
   background: #fff;
   border-radius: 12px;
   box-shadow: 0 8px 24px rgba(0,0,0,.12);
   list-style: none;
-  padding: 8px 0;
+  padding: 16px 0 8px;
   min-width: 200px;
   z-index: 100;
 }
