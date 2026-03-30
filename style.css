@@ -122,7 +122,7 @@ a { text-decoration: none; color: inherit; }
 
 /* ═══════════════════════════════════════════ HERO ══ */
 .hero {
-  position: relative; min-height: unset; aspect-ratio: 3 / 1;
+  position: relative; min-height: 100vh;
   background: linear-gradient(160deg, #2596e4 0%, #3aaee8 40%, #6dc8f0 100%);
   display: flex; align-items: center; overflow: hidden; padding-top: 80px;
 }
