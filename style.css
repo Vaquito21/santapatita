@@ -86,9 +86,18 @@ a { text-decoration: none; color: inherit; }
   to   { transform: translateX(calc(100vw + 300px)); }
 }
 
+/* ═══════════════════════════════════════════ ANNOUNCEMENT ══ */
+.announcement-bar {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 1001;
+  background: #3d3d3d; color: white;
+  text-align: center; padding: 8px 16px;
+  font-family: 'Poppins', sans-serif; font-size: .8rem; font-weight: 600;
+  letter-spacing: .08em;
+}
+
 /* ═══════════════════════════════════════════ NAV ══ */
 .nav {
-  position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+  position: fixed; top: 36px; left: 0; right: 0; z-index: 1000;
   padding: 10px 0; transition: var(--t);
 }
 .nav--scrolled {
@@ -124,7 +133,7 @@ a { text-decoration: none; color: inherit; }
 .hero {
   position: relative; min-height: 100vh;
   background: linear-gradient(160deg, #2596e4 0%, #3aaee8 40%, #6dc8f0 100%);
-  display: flex; align-items: center; overflow: hidden; padding-top: 80px;
+  display: flex; align-items: center; overflow: hidden; padding-top: 116px;
 }
 .hero__inner {
   position: relative; z-index: 1;
