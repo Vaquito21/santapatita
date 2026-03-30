@@ -647,17 +647,10 @@ document.querySelectorAll('.benefit-card,.store-card,.delivery-box,.flavor-card,
 </div>
 
 <script>
-const nosotrosBtn = document.getElementById('nosotrosBtn');
+const nosotrosDropdown = document.querySelector('.nav__dropdown');
 const nosotrosMenu = document.getElementById('nosotrosMenu');
-nosotrosBtn.addEventListener('click', function(e) {
-  e.preventDefault();
-  nosotrosMenu.classList.toggle('open');
-});
-document.addEventListener('click', function(e) {
-  if (!e.target.closest('.nav__dropdown')) {
-    nosotrosMenu.classList.remove('open');
-  }
-});
+nosotrosDropdown.addEventListener('mouseenter', function() { nosotrosMenu.classList.add('open'); });
+nosotrosDropdown.addEventListener('mouseleave', function() { nosotrosMenu.classList.remove('open'); });
 const historiaBtn = document.getElementById('historiaBtn');
 const historiaModal = document.getElementById('historiaModal');
 const historiaClose = document.getElementById('historiaClose');
