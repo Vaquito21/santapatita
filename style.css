@@ -600,6 +600,7 @@ a { text-decoration: none; color: inherit; }
   .benefits__grid  { grid-template-columns: 1fr; }
   .stores-grid     { grid-template-columns: 1fr 1fr; }
   .footer__inner   { grid-template-columns: 1fr; gap: 28px; }
+  .footer__links:last-child { text-align: left; }
 }
 
 @media (max-width: 480px) {
