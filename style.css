@@ -362,7 +362,10 @@ a { text-decoration: none; color: inherit; }
 }
 .size-card.visible .size-card__inner { opacity: 1; transform: none; }
 .size-card:hover .size-card__inner { border-color: var(--yellow); transform: translateY(-4px); }
-.size-card.selected .size-card__inner { border-color: var(--yellow); background: #FFFDE7; box-shadow: 0 0 0 4px rgba(247,198,24,.2); }
+.size-card.selected .size-card__inner { border-color: var(--yellow-d); background: var(--yellow); box-shadow: 0 0 0 4px rgba(247,198,24,.35), var(--shadow-lg); transform: translateY(-4px); }
+.size-card.selected .size-card__price { color: var(--dark); }
+.size-card.selected .size-card__units { color: var(--dark); }
+.size-card.selected .size-card__tag { color: rgba(26,26,46,.7); }
 .size-card--popular .size-card__inner { border-color: var(--yellow); }
 .size-card--disabled { cursor: not-allowed; pointer-events: none; }
 .size-card--disabled .size-card__inner { opacity: .35; }

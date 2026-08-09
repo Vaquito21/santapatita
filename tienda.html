@@ -313,7 +313,7 @@ function refreshSizeCards() {
     const priceEl = card.querySelector('.size-card__price');
     const available = !pricing || pricing[units] !== undefined;
 
-    card.classList.toggle('size-card--disabled', !available);
+    card.style.display = available ? '' : 'none';
     input.disabled = !available;
 
     if (pricing && pricing[units] !== undefined) {
