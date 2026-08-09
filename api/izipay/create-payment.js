@@ -48,10 +48,23 @@ module.exports = async (req, res) => {
   const total = subtotal + deliveryFee;
   const orderId = `SP${Date.now()}`;
 
+  // Izipay solo conoce el monto — el carrito y las coordenadas del mapa viajan como
+  // texto en orderInfo/orderInfo2 (y de respaldo en metadata) para que el webhook de
+  // notificación pueda incluirlos en el aviso de email/WhatsApp.
+  const cartInfo = JSON.stringify(cart.map((i) => ({ f: i.flavor, u: i.units, q: i.qty })));
+  const deliveryInfo = JSON.stringify({
+    type: deliveryType,
+    lat: delivery.lat || null,
+    lng: delivery.lng || null,
+  });
+
   const payload = {
     amount: total * 100,
     currency: 'PEN',
     orderId,
+    orderInfo: cartInfo,
+    orderInfo2: deliveryInfo,
+    metadata: { cart: cartInfo, delivery: deliveryInfo },
     customer: {
       email: customer.email,
       billingDetails: {

@@ -126,10 +126,13 @@
     btn.disabled = true;
     btn.textContent = 'Procesando...';
 
+    const lat = document.getElementById('deliveryLat').value;
+    const lng = document.getElementById('deliveryLng').value;
+
     const payload = {
       cart: cart.map(item => ({ flavor: item.flavor, units: item.units, qty: item.qty })),
       customer: { firstName, lastName, email, phone, address, city: district || undefined, identityCode: dni || undefined },
-      delivery: { type: deliveryType, district, date: document.getElementById('deliveryDate').value },
+      delivery: { type: deliveryType, district, date: document.getElementById('deliveryDate').value, lat: lat || null, lng: lng || null },
     };
 
     let data;

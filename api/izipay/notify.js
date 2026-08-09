@@ -57,44 +57,96 @@ module.exports = async (req, res) => {
 
   if (orderStatus === 'PAID') {
     const amount = transaction && typeof transaction.amount === 'number' ? transaction.amount / 100 : null;
-    const email = answer.customer && answer.customer.email;
-    const results = await Promise.allSettled([notifyEmail(orderId, amount, email), notifyWhatsapp(orderId, amount, email)]);
+    const customer = transaction && transaction.customer;
+    const billing = customer && customer.billingDetails;
+    const orderInfo = extractOrderInfo(transaction);
+
+    const details = {
+      orderId,
+      amount,
+      email: customer && customer.email,
+      name: billing ? [billing.firstName, billing.lastName].filter(Boolean).join(' ') : null,
+      phone: billing && billing.phoneNumber,
+      address: billing && billing.address,
+      district: billing && billing.city,
+      cart: orderInfo.cart,
+      deliveryType: orderInfo.deliveryType,
+      lat: orderInfo.lat,
+      lng: orderInfo.lng,
+    };
+
+    const results = await Promise.allSettled([notifyEmail(details), notifyWhatsapp(details)]);
     results.forEach((r) => { if (r.status === 'rejected') console.error('Notificación de pago falló:', r.reason); });
   }
 
   return res.status(200).send(`OK! OrderStatus is ${orderStatus}`);
 };
 
-async function notifyEmail(orderId, amount, customerEmail) {
+// El carrito/distrito/coordenadas viajan en orderInfo/orderInfo2 (o metadata como respaldo),
+// ya que Izipay solo conoce el monto — nunca los productos comprados.
+function extractOrderInfo(transaction) {
+  const result = { cart: [], deliveryType: null, lat: null, lng: null };
+  if (!transaction) return result;
+
+  const rawCart = transaction.orderInfo || (transaction.metadata && transaction.metadata.cart);
+  const rawDelivery = transaction.orderInfo2 || (transaction.metadata && transaction.metadata.delivery);
+
+  try { if (rawCart) result.cart = JSON.parse(rawCart); } catch (err) { console.error('No se pudo parsear orderInfo (cart):', rawCart); }
+  try {
+    if (rawDelivery) {
+      const parsed = typeof rawDelivery === 'string' ? JSON.parse(rawDelivery) : rawDelivery;
+      result.deliveryType = parsed.type;
+      result.lat = parsed.lat;
+      result.lng = parsed.lng;
+    }
+  } catch (err) { console.error('No se pudo parsear orderInfo2 (delivery):', rawDelivery); }
+
+  return result;
+}
+
+function cartLines(cart) {
+  if (!Array.isArray(cart) || cart.length === 0) return 'No disponible (revisar con el cliente)';
+  return cart.map((i) => `${i.f} × ${i.u}u × ${i.q} paquete(s)`).join(', ');
+}
+
+async function notifyEmail(d) {
   const apiKey = process.env.RESEND_API_KEY;
   const to = process.env.NOTIFY_EMAIL_TO;
   if (!apiKey || !to) return;
 
-  const amountText = amount != null ? `S/ ${amount}` : 'monto no disponible';
+  const amountText = d.amount != null ? `S/ ${d.amount}` : 'monto no disponible';
+  const mapLink = d.lat && d.lng ? `<p>Ubicación: <a href="https://www.google.com/maps?q=${d.lat},${d.lng}">ver en Google Maps</a></p>` : '';
   const res = await fetch('https://api.resend.com/emails', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${apiKey}` },
     body: JSON.stringify({
       from: 'Santa Patita <onboarding@resend.dev>',
       to: [to],
-      subject: `🐾 Nuevo pago recibido — ${orderId}`,
+      subject: `🐾 Nuevo pago recibido — ${d.orderId}`,
       html: `<p><strong>¡Nuevo pedido pagado!</strong></p>
-        <p>N° de orden: <strong>${orderId}</strong></p>
+        <p>N° de orden: <strong>${d.orderId}</strong></p>
         <p>Monto: <strong>${amountText}</strong></p>
-        ${customerEmail ? `<p>Cliente: ${customerEmail}</p>` : ''}
-        <p>Revisa el Back Office de Izipay para el detalle completo de la transacción.</p>`,
+        <p>Pedido: <strong>${cartLines(d.cart)}</strong></p>
+        <p>Cliente: ${d.name || 'No disponible'} ${d.phone ? '· ' + d.phone : ''} ${d.email ? '· ' + d.email : ''}</p>
+        <p>Entrega: ${d.deliveryType === 'delivery' ? 'Delivery' : 'Recojo en tienda'}${d.district ? ' — ' + d.district : ''}${d.address ? ' — ' + d.address : ''}</p>
+        ${mapLink}`,
     }),
   });
   if (!res.ok) throw new Error(`Resend respondió ${res.status}: ${await res.text()}`);
 }
 
-async function notifyWhatsapp(orderId, amount, customerEmail) {
+async function notifyWhatsapp(d) {
   const phone = process.env.CALLMEBOT_PHONE;
   const apiKey = process.env.CALLMEBOT_APIKEY;
   if (!phone || !apiKey) return;
 
-  const amountText = amount != null ? `S/ ${amount}` : 'monto no disponible';
-  const text = `🐾 Nuevo pago recibido\nOrden: ${orderId}\nMonto: ${amountText}${customerEmail ? `\nCliente: ${customerEmail}` : ''}`;
+  const amountText = d.amount != null ? `S/ ${d.amount}` : 'monto no disponible';
+  let text = `🐾 Nuevo pago recibido\nOrden: ${d.orderId}\nMonto: ${amountText}\n`;
+  text += `Pedido: ${cartLines(d.cart)}\n`;
+  text += `Cliente: ${d.name || 'No disponible'}${d.phone ? ' · ' + d.phone : ''}${d.email ? ' · ' + d.email : ''}\n`;
+  text += `Entrega: ${d.deliveryType === 'delivery' ? 'Delivery' : 'Recojo en tienda'}${d.district ? ' — ' + d.district : ''}${d.address ? ' — ' + d.address : ''}\n`;
+  if (d.lat && d.lng) text += `Ubicación: https://www.google.com/maps?q=${d.lat},${d.lng}\n`;
+
   const url = `https://api.callmebot.com/whatsapp.php?phone=${encodeURIComponent(phone)}&text=${encodeURIComponent(text)}&apikey=${encodeURIComponent(apiKey)}`;
   const res = await fetch(url);
   if (!res.ok) throw new Error(`CallMeBot respondió ${res.status}: ${await res.text()}`);
