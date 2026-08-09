@@ -533,12 +533,11 @@ a { text-decoration: none; color: inherit; }
   gap: 48px; padding: 48px 0 60px;
 }
 .footer__logo {
-  display: flex; align-items: center; gap: 10px; margin-bottom: 16px;
+  display: flex; align-items: center; gap: 10px; margin-bottom: 20px;
 }
-.footer__logo-text {
-  font-family: 'Fredoka One', cursive; font-size: 1.2rem; color: white; letter-spacing: .04em;
+.footer__logo-img {
+  height: 56px; background: white; border-radius: 14px; padding: 6px 14px;
 }
-.footer__brand p { color: rgba(255,255,255,.5); font-size: .88rem; line-height: 1.7; margin-bottom: 20px; max-width: 260px; }
 .footer__social { display: flex; gap: 10px; }
 .footer__social a {
   width: 38px; height: 38px; background: rgba(255,255,255,.08);
