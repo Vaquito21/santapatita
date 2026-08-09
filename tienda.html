@@ -16,11 +16,11 @@
   </style>
 </head>
 <body>
-<div class="announcement-bar">ENVÍO GRATIS LOS DOMINGOS DESDE S/ 17. CONSULTA LA COBERTURA <a href="/#delivery" class="announcement-bar__link"><span style="text-decoration:underline">AQUÍ</span></a></div>
+<div class="announcement-bar"><span class="announcement-bar__full">ENVÍO GRATIS LOS DOMINGOS DESDE S/ 17. CONSULTA LA COBERTURA</span><span class="announcement-bar__short">🎉 ENVÍO GRATIS LOS DOMINGOS</span> <a href="/#delivery" class="announcement-bar__link"><span style="text-decoration:underline">AQUÍ</span></a></div>
 <nav class="nav" id="nav">
   <div class="container nav__inner">
     <a href="/" class="nav__logo"><img src="logo.png" alt="Santa Patita" class="nav__logo-img"/></a>
-    <ul class="nav__links">
+    <ul class="nav__links" id="navLinks">
       <li><a href="/tienda" style="color:var(--sky-d)">Tienda</a></li>
       <li><a href="/suscripcion">Suscripción</a></li>
       <li><a href="/nosotros">Nosotros</a></li>
@@ -32,6 +32,7 @@
       <button class="nav__icon-btn" title="Mi cuenta"><svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></button>
       <button class="nav__icon-btn nav__icon-btn--cart" title="Carrito"><svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg><span class="nav__cart-badge">0</span></button>
     </div>
+    <button class="nav__burger" id="burger"><span></span><span></span><span></span></button>
   </div>
 </nav>
 
@@ -56,9 +57,9 @@
 </section>
 
 <footer style="background:#3d3d3d;color:white;text-align:center;padding:32px;font-family:'Poppins',sans-serif;font-size:.9rem;">
-  <p>© 2025 Santa Patita · Hecho con 🐾 en Lima, Perú</p>
+  <p>© 2026 Santa Patita · Hecho con 🐾 en Lima, Perú</p>
   <p style="margin-top:8px;opacity:.7;">WhatsApp: <a href="https://wa.me/51954172058" style="color:white;">+51 954 172 058</a> · Instagram: <a href="https://instagram.com/santa.patita" style="color:white;">@santa.patita</a></p>
 </footer>
-<script>const nav=document.getElementById('nav');window.addEventListener('scroll',()=>{nav.classList.toggle('nav--scrolled',window.scrollY>10);});</script>
+<script>const nav=document.getElementById('nav');window.addEventListener('scroll',()=>{nav.classList.toggle('nav--scrolled',window.scrollY>10);});document.getElementById('burger').addEventListener('click',()=>{document.getElementById('navLinks').classList.toggle('open');});</script>
 </body>
 </html>

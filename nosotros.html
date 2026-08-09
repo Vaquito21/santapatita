@@ -53,7 +53,7 @@
 <body>
 
 <!-- ═══ NAV ═══ -->
-<div class="announcement-bar">ENVÍO GRATIS LOS DOMINGOS DESDE S/ 17. CONSULTA LA COBERTURA <a href="/#delivery" class="announcement-bar__link"><span style="text-decoration:underline">AQUÍ</span></a></div>
+<div class="announcement-bar"><span class="announcement-bar__full">ENVÍO GRATIS LOS DOMINGOS DESDE S/ 17. CONSULTA LA COBERTURA</span><span class="announcement-bar__short">🎉 ENVÍO GRATIS LOS DOMINGOS</span> <a href="/#delivery" class="announcement-bar__link"><span style="text-decoration:underline">AQUÍ</span></a></div>
 <nav class="nav" id="nav">
   <div class="container nav__inner">
     <a href="/" class="nav__logo">
@@ -78,6 +78,9 @@
         <span class="nav__cart-badge">0</span>
       </button>
     </div>
+    <button class="nav__burger" id="burger">
+      <span></span><span></span><span></span>
+    </button>
   </div>
 </nav>
 
@@ -105,7 +108,7 @@
       <div class="tl__item">
         <div class="tl__dot"></div>
         <div class="tl__card">
-          <span class="tl__year">2025</span>
+          <span class="tl__year">2022</span>
           <h3>La idea</h3>
           <p>Todo empezó con el amor por nuestras mascotas y la búsqueda de snacks naturales que realmente les hicieran bien.</p>
         </div>
@@ -113,7 +116,7 @@
       <div class="tl__item tl__item--right">
         <div class="tl__dot"></div>
         <div class="tl__card">
-          <span class="tl__year">2025</span>
+          <span class="tl__year">2023</span>
           <h3>Primeras gomitas</h3>
           <p>Desarrollamos nuestra primera receta de colágeno artesanal. Meses de pruebas y muchas colas de perritos contentos.</p>
         </div>
@@ -121,7 +124,7 @@
       <div class="tl__item">
         <div class="tl__dot"></div>
         <div class="tl__card">
-          <span class="tl__year">2025</span>
+          <span class="tl__year">2024</span>
           <h3>Santa Patita nace oficialmente</h3>
           <p>Lanzamos la marca y llegamos a nuestros primeros puntos físicos en Lima con mucho amor.</p>
         </div>
@@ -129,7 +132,7 @@
       <div class="tl__item tl__item--right">
         <div class="tl__dot"></div>
         <div class="tl__card">
-          <span class="tl__year">2026</span>
+          <span class="tl__year">2025</span>
           <h3>Seguimos creciendo</h3>
           <p>4 sabores, 4 tiendas aliadas y cientos de peluditos felices. Cada huellita es un paso más fuerte. 🐾</p>
         </div>
@@ -154,7 +157,7 @@
       </div>
       <div class="team-card">
         <div class="team-card__avatar">👨</div>
-        <h3>Co-fundador</h3>
+        <h3>Sebastián</h3>
         <p class="team-card__role">Co-fundador</p>
         <p>El motor operativo de Santa Patita. Se encarga de que cada gomita llegue perfecta a su destino.</p>
       </div>
@@ -180,13 +183,16 @@
 
 <!-- ═══ FOOTER ═══ -->
 <footer style="background:#3d3d3d;color:white;text-align:center;padding:32px;font-family:'Poppins',sans-serif;font-size:.9rem;">
-  <p>© 2025 Santa Patita · Hecho con 🐾 en Lima, Perú</p>
+  <p>© 2026 Santa Patita · Hecho con 🐾 en Lima, Perú</p>
   <p style="margin-top:8px;opacity:.7;">WhatsApp: <a href="https://wa.me/51954172058" style="color:white;">+51 954 172 058</a> · Instagram: <a href="https://instagram.com/santa.patita" style="color:white;">@santa.patita</a></p>
 </footer>
 
 <script>
 const nav = document.getElementById('nav');
 window.addEventListener('scroll', () => { nav.classList.toggle('nav--scrolled', window.scrollY > 10); });
+document.getElementById('burger').addEventListener('click', () => {
+  document.getElementById('navLinks').classList.toggle('open');
+});
 </script>
 </body>
 </html>

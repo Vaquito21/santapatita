@@ -20,7 +20,7 @@
 </div>
 
 <!-- ═══ NAV ═══ -->
-<div class="announcement-bar">ENVÍO GRATIS LOS DOMINGOS DESDE S/ 17. CONSULTA LA COBERTURA <a href="#delivery" class="announcement-bar__link"><span style="text-decoration:underline">AQUÍ</span></a></div>
+<div class="announcement-bar"><span class="announcement-bar__full">ENVÍO GRATIS LOS DOMINGOS DESDE S/ 17. CONSULTA LA COBERTURA</span><span class="announcement-bar__short">🎉 ENVÍO GRATIS LOS DOMINGOS</span> <a href="#delivery" class="announcement-bar__link"><span style="text-decoration:underline">AQUÍ</span></a></div>
 <nav class="nav" id="nav">
   <div class="container nav__inner">
     <a href="#" class="nav__logo">
@@ -86,7 +86,7 @@
     </div>
   </div>
   <div class="hero__mascot">
-    <img src="hero-dog.png" alt="Santa Patita" class="hero-dog-img"/>
+    <img src="hero-dog.webp" alt="Santa Patita" class="hero-dog-img"/>
   </div>
   <div class="hero__wave">
     <svg viewBox="0 0 1440 100" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
@@ -471,7 +471,7 @@
     </div>
   </div>
   <div class="footer__bottom">
-    <p>© 2025 Santa Patita · Snacks de colágeno natural · Hecho con 🐾 en Lima, Perú</p>
+    <p>© 2026 Santa Patita · Snacks de colágeno natural · Hecho con 🐾 en Lima, Perú</p>
   </div>
 </footer>
 
@@ -585,8 +585,10 @@ document.getElementById('burger').addEventListener('click', () => {
 
 // ── Smooth scroll ──
 document.querySelectorAll('a[href^="#"]').forEach(a => {
+  const href = a.getAttribute('href');
+  if (href === '#') return; // enlaces vacíos (ej. logo) no deben interceptar el click
   a.addEventListener('click', e => {
-    const t = document.querySelector(a.getAttribute('href'));
+    const t = document.querySelector(href);
     if (t) { e.preventDefault(); t.scrollIntoView({behavior:'smooth'}); }
   });
 });
@@ -594,84 +596,6 @@ document.querySelectorAll('a[href^="#"]').forEach(a => {
 // ── Animate on scroll ──
 const io = new IntersectionObserver(entries => entries.forEach(e => { if(e.isIntersecting) e.target.classList.add('visible'); }), {threshold:.1});
 document.querySelectorAll('.benefit-card,.store-card,.delivery-box,.flavor-card,.size-card').forEach(el => io.observe(el));
-</script>
-<!-- ═══ NOSOTROS DROPDOWN ═══ -->
-<div id="nosotrosMenu" style="display:none;position:fixed;z-index:99999;background:#fff;border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,.18);padding:8px 0;min-width:200px;">
-  <a href="#" id="historiaBtn" style="display:block;padding:11px 20px;color:#3d3d3d;font-family:'Poppins',sans-serif;font-weight:600;font-size:14px;text-decoration:none;">Historia</a>
-  <a href="#equipo" style="display:block;padding:11px 20px;color:#3d3d3d;font-family:'Poppins',sans-serif;font-weight:600;font-size:14px;text-decoration:none;">Equipo</a>
-  <a href="#testimonios" style="display:block;padding:11px 20px;color:#3d3d3d;font-family:'Poppins',sans-serif;font-weight:600;font-size:14px;text-decoration:none;">Testimonios</a>
-  <a href="#faq" style="display:block;padding:11px 20px;color:#3d3d3d;font-family:'Poppins',sans-serif;font-weight:600;font-size:14px;text-decoration:none;">Preguntas Frecuentes</a>
-</div>
-
-<!-- ═══ MODAL HISTORIA ═══ -->
-<div class="modal-overlay" id="historiaModal">
-  <div class="modal-box">
-    <button class="modal-close" id="historiaClose">✕</button>
-    <h2 class="modal-title">Nuestra Historia 🐾</h2>
-    <div class="tl">
-      <div class="tl__line"></div>
-      <div class="tl__item">
-        <div class="tl__dot"></div>
-        <div class="tl__card">
-          <span class="tl__year">2025</span>
-          <h3>El inicio</h3>
-          <p>Todo empezó con el amor por nuestras mascotas y la búsqueda de snacks naturales que realmente les hicieran bien.</p>
-        </div>
-      </div>
-      <div class="tl__item tl__item--right">
-        <div class="tl__dot"></div>
-        <div class="tl__card">
-          <span class="tl__year">2025</span>
-          <h3>Primeras gomitas</h3>
-          <p>Desarrollamos nuestra primera receta de colágeno artesanal. Meses de pruebas y muchas colas de perritos contentos.</p>
-        </div>
-      </div>
-      <div class="tl__item">
-        <div class="tl__dot"></div>
-        <div class="tl__card">
-          <span class="tl__year">2025</span>
-          <h3>Santa Patita nace oficialmente</h3>
-          <p>Lanzamos la marca y llegamos a nuestros primeros puntos físicos en Lima con mucho amor.</p>
-        </div>
-      </div>
-      <div class="tl__item tl__item--right">
-        <div class="tl__dot"></div>
-        <div class="tl__card">
-          <span class="tl__year">2026</span>
-          <h3>Seguimos creciendo</h3>
-          <p>4 sabores, 4 tiendas aliadas y cientos de peluditos felices. Cada huellita es un paso más fuerte. 🐾</p>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<script>
-const nosotrosBtn = document.getElementById('nosotrosBtn');
-const nosotrosMenu = document.getElementById('nosotrosMenu');
-nosotrosBtn.addEventListener('mouseenter', function() {
-  const rect = nosotrosBtn.getBoundingClientRect();
-  nosotrosMenu.style.display = 'block';
-  nosotrosMenu.style.top = (rect.bottom + 6) + 'px';
-  nosotrosMenu.style.left = (rect.left + rect.width / 2) + 'px';
-  nosotrosMenu.style.transform = 'translateX(-50%)';
-});
-nosotrosBtn.addEventListener('mouseleave', function(e) {
-  if (!nosotrosMenu.contains(e.relatedTarget)) nosotrosMenu.style.display = 'none';
-});
-nosotrosMenu.addEventListener('mouseleave', function(e) {
-  if (!nosotrosBtn.contains(e.relatedTarget)) nosotrosMenu.style.display = 'none';
-});
-const historiaBtn = document.getElementById('historiaBtn');
-const historiaModal = document.getElementById('historiaModal');
-const historiaClose = document.getElementById('historiaClose');
-historiaBtn.addEventListener('click', function(e) {
-  e.preventDefault();
-  nosotrosMenu.classList.remove('open');
-  historiaModal.classList.add('open');
-});
-historiaClose.addEventListener('click', function() { historiaModal.classList.remove('open'); });
-historiaModal.addEventListener('click', function(e) { if(e.target === historiaModal) historiaModal.classList.remove('open'); });
 </script>
 </body>
 </html>
