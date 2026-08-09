@@ -319,6 +319,13 @@
           <span class="qty-display" id="qtyDisplay">1</span>
           <button class="qty-btn" id="qtyPlus" type="button">+</button>
         </div>
+        <button type="button" class="btn btn--sky btn--full" id="addFlavorBtn" style="margin-top:18px;">➕ Agregar este sabor al pedido</button>
+      </div>
+
+      <!-- CARRITO: sabores agregados -->
+      <div class="order-step" id="cartWrap" style="display:none;">
+        <div class="step-label">🛒 Tu pedido</div>
+        <div class="cart-list" id="cartList"></div>
       </div>
 
       <!-- PASO 4: FECHA -->
@@ -366,16 +373,8 @@
       <div class="order-summary" id="orderSummary">
         <div class="order-summary__detail">
           <div class="summary-row">
-            <span>Sabor:</span>
-            <strong id="sumFlavor">— elige arriba —</strong>
-          </div>
-          <div class="summary-row">
-            <span>Cantidad:</span>
-            <strong id="sumUnits">— elige arriba —</strong>
-          </div>
-          <div class="summary-row">
-            <span>Paquetes:</span>
-            <strong id="sumQty">1</strong>
+            <span>Sabores en el pedido:</span>
+            <strong id="sumFlavor">— agrega arriba —</strong>
           </div>
           <div class="summary-row">
             <span>Fecha:</span>
@@ -574,7 +573,8 @@
 
 <script>
 // ── State ──
-let selectedFlavor = null, selectedSize = null, selectedPrice = 0, qty = 1;
+let selectedFlavor = null, selectedUnits = null, selectedSize = null, selectedPrice = 0, qty = 1;
+let cart = [];
 
 // ── Precios por sabor + cantidad ──
 // Tradicional/Mixto/Zanahoria/Brócoli vienen en 5/10/20u. Blue Velvet y Pink Velvet solo en 20u.
@@ -646,6 +646,7 @@ document.querySelectorAll('.size-card input').forEach(inp => {
     document.querySelectorAll('.size-card').forEach(c => c.classList.remove('selected'));
     inp.closest('.size-card').classList.add('selected');
     const units = parseInt(inp.closest('.size-card').dataset.units);
+    selectedUnits = units;
     selectedSize = units + ' unidades';
     selectedPrice = (FLAVOR_PRICING[selectedFlavor] || {})[units] || 0;
     updateSummary();
@@ -655,6 +656,55 @@ document.querySelectorAll('.size-card input').forEach(inp => {
 // ── Qty ──
 document.getElementById('qtyMinus').addEventListener('click', () => { if (qty > 1) { qty--; document.getElementById('qtyDisplay').textContent = qty; updateSummary(); } });
 document.getElementById('qtyPlus').addEventListener('click',  () => { qty++; document.getElementById('qtyDisplay').textContent = qty; updateSummary(); });
+
+// ── Agregar sabor al carrito ──
+document.getElementById('addFlavorBtn').addEventListener('click', () => {
+  if (!selectedFlavor) { alert('🐾 ¡Elige un sabor primero!'); return; }
+  if (!selectedUnits)  { alert('🐾 ¡Elige una cantidad!'); return; }
+
+  const existing = cart.find(item => item.flavor === selectedFlavor && item.units === selectedUnits);
+  if (existing) {
+    existing.qty += qty;
+  } else {
+    cart.push({ flavor: selectedFlavor, units: selectedUnits, price: selectedPrice, qty: qty });
+  }
+
+  document.querySelectorAll('.flavor-card').forEach(c => c.classList.remove('selected'));
+  document.querySelectorAll('.flavor-card input').forEach(i => i.checked = false);
+  document.querySelectorAll('.size-card').forEach(c => { c.classList.remove('selected'); c.classList.remove('size-card--disabled'); });
+  document.querySelectorAll('.size-card input').forEach(i => { i.checked = false; i.disabled = false; });
+  document.getElementById('sizeNote').style.display = 'none';
+  selectedFlavor = null; selectedUnits = null; selectedSize = null; selectedPrice = 0; qty = 1;
+  document.getElementById('qtyDisplay').textContent = '1';
+
+  renderCart();
+  updateSummary();
+});
+
+// ── Carrito ──
+function cartSubtotal() {
+  return cart.reduce((sum, item) => sum + item.price * item.qty, 0);
+}
+
+function renderCart() {
+  const wrap = document.getElementById('cartWrap');
+  const list = document.getElementById('cartList');
+  if (cart.length === 0) { wrap.style.display = 'none'; list.innerHTML = ''; return; }
+  wrap.style.display = 'block';
+  list.innerHTML = cart.map((item, i) => `
+    <div class="cart-item">
+      <div class="cart-item__info"><strong>${item.flavor}</strong> · ${item.units}u × ${item.qty} paquete(s) — <span class="cart-item__price">S/ ${item.price * item.qty}</span></div>
+      <button type="button" class="cart-item__remove" data-index="${i}" aria-label="Quitar">✕</button>
+    </div>
+  `).join('');
+  list.querySelectorAll('.cart-item__remove').forEach(btn => {
+    btn.addEventListener('click', () => {
+      cart.splice(parseInt(btn.dataset.index), 1);
+      renderCart();
+      updateSummary();
+    });
+  });
+}
 
 // ── Date ──
 dateInput.addEventListener('change', () => {
@@ -683,29 +733,31 @@ dateInput.addEventListener('change', () => {
 
 // ── Summary ──
 function updateSummary() {
-  document.getElementById('sumFlavor').textContent = selectedFlavor || '— elige arriba —';
-  document.getElementById('sumUnits').textContent  = selectedSize  || '— elige arriba —';
-  document.getElementById('sumQty').textContent    = qty;
+  document.getElementById('sumFlavor').textContent = cart.length > 0
+    ? `${cart.length} sabor${cart.length > 1 ? 'es' : ''}`
+    : '— agrega arriba —';
   const d = dateInput.value ? new Date(dateInput.value + 'T12:00:00').toLocaleDateString('es-PE', {weekday:'long',day:'numeric',month:'long'}) : '— elige arriba —';
   document.getElementById('sumDate').textContent   = d;
-  document.getElementById('sumTotal').textContent  = selectedPrice ? 'S/ ' + (selectedPrice * qty) : 'S/ —';
+  const total = cartSubtotal();
+  document.getElementById('sumTotal').textContent  = total ? 'S/ ' + total : 'S/ —';
 }
 
 // ── Order ──
 function sendOrder() {
-  if (!selectedFlavor) { alert('🐾 ¡Elige un sabor primero!'); return; }
-  if (!selectedSize)   { alert('🐾 ¡Elige una cantidad!'); return; }
-  if (!dateInput.value){ alert('🐾 ¡Elige la fecha de entrega!'); return; }
+  if (cart.length === 0)  { alert('🐾 ¡Agrega al menos un sabor a tu pedido!'); return; }
+  if (!dateInput.value)   { alert('🐾 ¡Elige la fecha de entrega!'); return; }
 
   const d = new Date(dateInput.value + 'T12:00:00');
   const isSunday = d.getDay() === 0;
   const dateStr = d.toLocaleDateString('es-PE', {weekday:'long', day:'numeric', month:'long', year:'numeric'});
-  const total = selectedPrice * qty;
+  const total = cartSubtotal();
   const deliveryType = document.querySelector('input[name=delivery]:checked').value;
 
   let msg = `¡Hola Santa Patita! 🐾 Quiero hacer un pedido:\n\n`;
-  msg += `🍖 *Sabor:* ${selectedFlavor}\n`;
-  msg += `📦 *Cantidad:* ${selectedSize} × ${qty} paquete(s)\n`;
+  msg += `🍖 *Pedido:*\n`;
+  cart.forEach(item => {
+    msg += `- ${item.flavor} × ${item.units}u × ${item.qty} paquete(s) = S/ ${item.price * item.qty}\n`;
+  });
   msg += `💰 *Total producto:* S/ ${total}\n`;
   msg += `📅 *Fecha de entrega:* ${dateStr}\n`;
   msg += `🚚 *Tipo:* ${deliveryType === 'delivery' ? 'Delivery a domicilio' : 'Recojo en tienda'}\n`;
