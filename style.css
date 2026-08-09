@@ -529,8 +529,8 @@ a { text-decoration: none; color: inherit; }
 .footer { background: var(--dark); position: relative; }
 .footer__wave svg { display: block; width: 100%; height: 50px; }
 .footer__inner {
-  display: flex; flex-wrap: wrap; justify-content: space-between;
-  gap: 40px 48px; padding-top: 48px; padding-bottom: 60px;
+  display: flex; flex-wrap: wrap; justify-content: center;
+  gap: 32px 72px; padding-top: 48px; padding-bottom: 60px;
 }
 .footer__logo {
   display: flex; align-items: center; gap: 10px; margin-bottom: 16px;
@@ -572,7 +572,6 @@ a { text-decoration: none; color: inherit; }
 @media (max-width: 1024px) {
   .benefits__grid  { grid-template-columns: repeat(2,1fr); }
   .stores-grid     { grid-template-columns: repeat(2,1fr); }
-  .footer__brand   { flex-basis: 100%; }
 }
 
 @media (max-width: 768px) {
