@@ -9,10 +9,10 @@ module.exports = async (req, res) => {
   }
 
   const shopId = process.env.IZIPAY_SHOP_ID;
-  const testKey = process.env.IZIPAY_TEST_KEY;
-  const publicKey = process.env.IZIPAY_PUBLIC_KEY_TEST;
+  const secretKey = process.env.IZIPAY_PROD_KEY;
+  const publicKey = process.env.IZIPAY_PUBLIC_KEY_PROD;
 
-  if (!shopId || !testKey || !publicKey) {
+  if (!shopId || !secretKey || !publicKey) {
     console.error('Faltan variables de entorno IZIPAY_* en Vercel.');
     return res.status(500).json({ error: 'Configuración de pago incompleta.' });
   }
@@ -56,7 +56,7 @@ module.exports = async (req, res) => {
 
   let izipayResponse;
   try {
-    const auth = Buffer.from(`${shopId}:${testKey}`).toString('base64');
+    const auth = Buffer.from(`${shopId}:${secretKey}`).toString('base64');
     const apiRes = await fetch(IZIPAY_API_URL, {
       method: 'POST',
       headers: {

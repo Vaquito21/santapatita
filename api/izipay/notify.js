@@ -26,12 +26,12 @@ module.exports = async (req, res) => {
     return res.status(400).send('Notificación incompleta.');
   }
 
-  const hmacKey = process.env.IZIPAY_HMAC_TEST;
-  const passwordKey = process.env.IZIPAY_TEST_KEY;
+  const hmacKey = process.env.IZIPAY_HMAC_PROD;
+  const passwordKey = process.env.IZIPAY_PROD_KEY;
   const key = krHashKey === 'password' ? passwordKey : hmacKey;
 
   if (!key) {
-    console.error('Falta la clave IZIPAY_HMAC_TEST / IZIPAY_TEST_KEY en Vercel.');
+    console.error('Falta la clave IZIPAY_HMAC_PROD / IZIPAY_PROD_KEY en Vercel.');
     return res.status(500).send('Configuración de validación incompleta.');
   }
 
