@@ -193,6 +193,8 @@
       if (deliveryType === 'delivery') {
         msg += `📍 *Distrito:* ${district}\n`;
         msg += `🏠 *Dirección:* ${address}\n`;
+        const lat = document.getElementById('deliveryLat').value, lng = document.getElementById('deliveryLng').value;
+        if (lat && lng) msg += `🗺️ *Ubicación:* https://www.google.com/maps?q=${lat},${lng}\n`;
       }
       msg += `\n¿Pueden confirmarme la entrega? ¡Gracias!`;
 

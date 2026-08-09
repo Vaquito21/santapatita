@@ -217,7 +217,11 @@
           <option value="Cercado de Lima">Cercado de Lima — S/ 10</option>
           <option value="La Victoria">La Victoria — S/ 12</option>
         </select>
-        <input type="text" id="deliveryAddress" class="date-input" placeholder="Dirección exacta (calle, número, referencia)"/>
+        <input type="text" id="deliveryAddress" class="date-input" placeholder="Dirección exacta (calle, número, referencia)" style="margin-bottom:10px;" onfocus="window.initDeliveryMap && window.initDeliveryMap()"/>
+        <div id="deliveryMap" class="delivery-map"></div>
+        <p class="date-hint" id="deliveryMapHint">📍 Selecciona tu dirección de la lista o ajusta el pin en el mapa para confirmar tu ubicación exacta.</p>
+        <input type="hidden" id="deliveryLat"/>
+        <input type="hidden" id="deliveryLng"/>
       </div>
 
       <!-- RESUMEN + CTA -->
@@ -564,6 +568,8 @@ function sendOrder() {
   if (deliveryType === 'delivery') {
     msg += `📍 *Distrito:* ${districtSelect.value}\n`;
     msg += `🏠 *Dirección:* ${document.getElementById('deliveryAddress').value.trim()}\n`;
+    const lat = document.getElementById('deliveryLat').value, lng = document.getElementById('deliveryLng').value;
+    if (lat && lng) msg += `🗺️ *Ubicación:* https://www.google.com/maps?q=${lat},${lng}\n`;
     msg += `🛵 *Delivery:* ${deliveryFee === 0 ? 'GRATIS 🎉' : 'S/ ' + deliveryFee}\n`;
   }
   msg += `💵 *Total a pagar:* S/ ${total}\n`;
@@ -596,6 +602,7 @@ document.querySelectorAll('a[href^="#"]').forEach(a => {
 const io = new IntersectionObserver(entries => entries.forEach(e => { if(e.isIntersecting) e.target.classList.add('visible'); }), {threshold:.1});
 document.querySelectorAll('.benefit-card,.store-card,.delivery-box,.flavor-card,.size-card').forEach(el => io.observe(el));
 </script>
+<script src="delivery-map.js"></script>
 <script src="checkout-izipay.js"></script>
 </body>
 </html>
