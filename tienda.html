@@ -306,6 +306,7 @@ function refreshSizeCards() {
   const pricing = FLAVOR_PRICING[selectedFlavor] || null;
   const note = document.getElementById('sizeNote');
   let sizeStillValid = false;
+  const availableUnits = [];
 
   document.querySelectorAll('.size-card').forEach(card => {
     const units = parseInt(card.dataset.units);
@@ -318,6 +319,7 @@ function refreshSizeCards() {
 
     if (pricing && pricing[units] !== undefined) {
       priceEl.textContent = 'S/ ' + pricing[units];
+      availableUnits.push(units);
     }
     if (input.checked && available) sizeStillValid = true;
   });
@@ -332,8 +334,20 @@ function refreshSizeCards() {
   if (!sizeStillValid) {
     document.querySelectorAll('.size-card').forEach(c => c.classList.remove('selected'));
     document.querySelectorAll('.size-card input').forEach(i => i.checked = false);
+    selectedUnits = null;
     selectedSize = null;
     selectedPrice = 0;
+
+    // Si el sabor solo tiene una presentación disponible, seleccionarla automáticamente
+    if (pricing && availableUnits.length === 1) {
+      const onlyUnits = availableUnits[0];
+      const onlyCard = document.querySelector(`.size-card[data-units="${onlyUnits}"]`);
+      onlyCard.classList.add('selected');
+      onlyCard.querySelector('input').checked = true;
+      selectedUnits = onlyUnits;
+      selectedSize = onlyUnits + ' unidades';
+      selectedPrice = pricing[onlyUnits];
+    }
   }
 }
 
