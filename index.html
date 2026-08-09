@@ -219,6 +219,22 @@
               <div class="flavor-card__desc">Super nutritivo</div>
             </div>
           </label>
+          <label class="flavor-card" data-flavor="Blue Velvet">
+            <input type="radio" name="flavor" value="Blue Velvet"/>
+            <div class="flavor-card__inner">
+              <div class="flavor-card__emoji">🔵</div>
+              <div class="flavor-card__name">Blue Velvet</div>
+              <div class="flavor-card__desc">Pata de pollo, espirulina azul y chía · solo 20u</div>
+            </div>
+          </label>
+          <label class="flavor-card" data-flavor="Pink Velvet">
+            <input type="radio" name="flavor" value="Pink Velvet"/>
+            <div class="flavor-card__inner">
+              <div class="flavor-card__emoji">🌸</div>
+              <div class="flavor-card__name">Pink Velvet</div>
+              <div class="flavor-card__desc">Pata de pollo, manzana y beterraga · solo 20u</div>
+            </div>
+          </label>
         </div>
       </div>
 
@@ -226,32 +242,33 @@
       <div class="order-step">
         <div class="step-label"><span class="step-num">2</span> Elige la cantidad</div>
         <div class="sizes-grid">
-          <label class="size-card" data-price="5" data-units="5">
+          <label class="size-card" data-units="5">
             <input type="radio" name="size" value="5"/>
             <div class="size-card__inner">
               <div class="size-card__units">5 unidades</div>
-              <div class="size-card__price">S/ 5</div>
+              <div class="size-card__price">S/ 7</div>
               <div class="size-card__tag">Ideal para probar</div>
             </div>
           </label>
-          <label class="size-card" data-price="9" data-units="10">
+          <label class="size-card" data-units="10">
             <input type="radio" name="size" value="10"/>
             <div class="size-card__inner">
               <div class="size-card__units">10 unidades</div>
-              <div class="size-card__price">S/ 9</div>
-              <div class="size-card__tag">S/ 0.90 c/u</div>
+              <div class="size-card__price">S/ 12</div>
+              <div class="size-card__tag">S/ 1.20 c/u</div>
             </div>
           </label>
-          <label class="size-card size-card--popular" data-price="17" data-units="20">
+          <label class="size-card size-card--popular" data-units="20">
             <input type="radio" name="size" value="20"/>
             <div class="size-card__popular-badge">⭐ Más popular</div>
             <div class="size-card__inner">
               <div class="size-card__units">20 unidades</div>
-              <div class="size-card__price">S/ 17</div>
+              <div class="size-card__price">S/ 20</div>
               <div class="size-card__tag">Mejor precio 🏆</div>
             </div>
           </label>
         </div>
+        <p class="size-card__note" id="sizeNote" style="display:none;margin-top:10px;font-size:.82rem;color:var(--muted);font-weight:700;"></p>
       </div>
 
       <!-- PASO 3: CANTIDAD DE PAQUETES -->
@@ -450,6 +467,8 @@
         <li>🎉 Mixto</li>
         <li>🥕 Zanahoria</li>
         <li>🥦 Brócoli</li>
+        <li>🔵 Blue Velvet</li>
+        <li>🌸 Pink Velvet</li>
       </ul>
     </div>
     <div class="footer__links">
@@ -484,10 +503,57 @@
 // ── State ──
 let selectedFlavor = null, selectedSize = null, selectedPrice = 0, qty = 1;
 
+// ── Precios por sabor + cantidad ──
+// Tradicional/Mixto/Zanahoria/Brócoli vienen en 5/10/20u. Blue Velvet y Pink Velvet solo en 20u.
+const FLAVOR_PRICING = {
+  'Tradicional': { 5: 7, 10: 12, 20: 20 },
+  'Mixto':       { 5: 7, 10: 12, 20: 20 },
+  'Zanahoria':   { 5: 7, 10: 12, 20: 20 },
+  'Brócoli':     { 5: 7, 10: 12, 20: 20 },
+  'Blue Velvet': { 20: 25 },
+  'Pink Velvet': { 20: 22 },
+};
+
 // ── Min date (today + 3 days) ──
 const dateInput = document.getElementById('deliveryDate');
 const minDate = new Date(); minDate.setDate(minDate.getDate() + 3);
 dateInput.min = minDate.toISOString().split('T')[0];
+
+// ── Refleja en las tarjetas de tamaño los precios/disponibilidad del sabor elegido ──
+function refreshSizeCards() {
+  const pricing = FLAVOR_PRICING[selectedFlavor] || null;
+  const note = document.getElementById('sizeNote');
+  let sizeStillValid = false;
+
+  document.querySelectorAll('.size-card').forEach(card => {
+    const units = parseInt(card.dataset.units);
+    const input = card.querySelector('input');
+    const priceEl = card.querySelector('.size-card__price');
+    const available = !pricing || pricing[units] !== undefined;
+
+    card.classList.toggle('size-card--disabled', !available);
+    input.disabled = !available;
+
+    if (pricing && pricing[units] !== undefined) {
+      priceEl.textContent = 'S/ ' + pricing[units];
+    }
+    if (input.checked && available) sizeStillValid = true;
+  });
+
+  if (pricing && (selectedFlavor === 'Blue Velvet' || selectedFlavor === 'Pink Velvet')) {
+    note.style.display = 'block';
+    note.textContent = `🎨 ${selectedFlavor} viene únicamente en presentación de 20 unidades.`;
+  } else {
+    note.style.display = 'none';
+  }
+
+  if (!sizeStillValid) {
+    document.querySelectorAll('.size-card').forEach(c => c.classList.remove('selected'));
+    document.querySelectorAll('.size-card input').forEach(i => i.checked = false);
+    selectedSize = null;
+    selectedPrice = 0;
+  }
+}
 
 // ── Flavor select ──
 document.querySelectorAll('.flavor-card input').forEach(inp => {
@@ -495,6 +561,7 @@ document.querySelectorAll('.flavor-card input').forEach(inp => {
     document.querySelectorAll('.flavor-card').forEach(c => c.classList.remove('selected'));
     inp.closest('.flavor-card').classList.add('selected');
     selectedFlavor = inp.value;
+    refreshSizeCards();
     updateSummary();
   });
 });
@@ -502,10 +569,12 @@ document.querySelectorAll('.flavor-card input').forEach(inp => {
 // ── Size select ──
 document.querySelectorAll('.size-card input').forEach(inp => {
   inp.addEventListener('change', () => {
+    if (inp.disabled) return;
     document.querySelectorAll('.size-card').forEach(c => c.classList.remove('selected'));
     inp.closest('.size-card').classList.add('selected');
-    selectedSize = inp.closest('.size-card').dataset.units + ' unidades';
-    selectedPrice = parseInt(inp.closest('.size-card').dataset.price);
+    const units = parseInt(inp.closest('.size-card').dataset.units);
+    selectedSize = units + ' unidades';
+    selectedPrice = (FLAVOR_PRICING[selectedFlavor] || {})[units] || 0;
     updateSummary();
   });
 });

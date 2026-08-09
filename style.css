@@ -336,7 +336,7 @@ a { text-decoration: none; color: inherit; }
 }
 
 /* Flavors */
-.flavors-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 16px; }
+.flavors-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 16px; }
 .flavor-card { cursor: pointer; }
 .flavor-card input { display: none; }
 .flavor-card__inner {
@@ -364,6 +364,8 @@ a { text-decoration: none; color: inherit; }
 .size-card:hover .size-card__inner { border-color: var(--yellow); transform: translateY(-4px); }
 .size-card.selected .size-card__inner { border-color: var(--yellow); background: #FFFDE7; box-shadow: 0 0 0 4px rgba(247,198,24,.2); }
 .size-card--popular .size-card__inner { border-color: var(--yellow); }
+.size-card--disabled { cursor: not-allowed; pointer-events: none; }
+.size-card--disabled .size-card__inner { opacity: .35; }
 .size-card__popular-badge {
   position: absolute; top: -12px; left: 50%; transform: translateX(-50%);
   background: var(--yellow); color: var(--dark); font-size: .72rem; font-weight: 900;
