@@ -551,6 +551,7 @@ a { text-decoration: none; color: inherit; }
 .footer__links li { margin-bottom: 10px; color: rgba(255,255,255,.5); font-size: .88rem; }
 .footer__links a { color: rgba(255,255,255,.5); transition: color var(--t); }
 .footer__links a:hover { color: var(--yellow); }
+.footer__links:last-child { text-align: right; }
 .footer__bottom { border-top: 1px solid rgba(255,255,255,.08); padding: 20px 0; text-align: center; }
 .footer__bottom p { color: rgba(255,255,255,.3); font-size: .8rem; }
 
