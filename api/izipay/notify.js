@@ -50,9 +50,52 @@ module.exports = async (req, res) => {
 
   const orderStatus = answer.orderStatus;
   const orderId = answer.orderDetails && answer.orderDetails.orderId;
-  const transactionUuid = answer.transactions && answer.transactions[0] && answer.transactions[0].uuid;
+  const transaction = answer.transactions && answer.transactions[0];
+  const transactionUuid = transaction && transaction.uuid;
 
   console.log(`Izipay IPN: orden ${orderId} → ${orderStatus} (tx ${transactionUuid})`);
 
+  if (orderStatus === 'PAID') {
+    const amount = transaction && typeof transaction.amount === 'number' ? transaction.amount / 100 : null;
+    const email = answer.customer && answer.customer.email;
+    const results = await Promise.allSettled([notifyEmail(orderId, amount, email), notifyWhatsapp(orderId, amount, email)]);
+    results.forEach((r) => { if (r.status === 'rejected') console.error('Notificación de pago falló:', r.reason); });
+  }
+
   return res.status(200).send(`OK! OrderStatus is ${orderStatus}`);
 };
+
+async function notifyEmail(orderId, amount, customerEmail) {
+  const apiKey = process.env.RESEND_API_KEY;
+  const to = process.env.NOTIFY_EMAIL_TO;
+  if (!apiKey || !to) return;
+
+  const amountText = amount != null ? `S/ ${amount}` : 'monto no disponible';
+  const res = await fetch('https://api.resend.com/emails', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${apiKey}` },
+    body: JSON.stringify({
+      from: 'Santa Patita <onboarding@resend.dev>',
+      to: [to],
+      subject: `🐾 Nuevo pago recibido — ${orderId}`,
+      html: `<p><strong>¡Nuevo pedido pagado!</strong></p>
+        <p>N° de orden: <strong>${orderId}</strong></p>
+        <p>Monto: <strong>${amountText}</strong></p>
+        ${customerEmail ? `<p>Cliente: ${customerEmail}</p>` : ''}
+        <p>Revisa el Back Office de Izipay para el detalle completo de la transacción.</p>`,
+    }),
+  });
+  if (!res.ok) throw new Error(`Resend respondió ${res.status}: ${await res.text()}`);
+}
+
+async function notifyWhatsapp(orderId, amount, customerEmail) {
+  const phone = process.env.CALLMEBOT_PHONE;
+  const apiKey = process.env.CALLMEBOT_APIKEY;
+  if (!phone || !apiKey) return;
+
+  const amountText = amount != null ? `S/ ${amount}` : 'monto no disponible';
+  const text = `🐾 Nuevo pago recibido\nOrden: ${orderId}\nMonto: ${amountText}${customerEmail ? `\nCliente: ${customerEmail}` : ''}`;
+  const url = `https://api.callmebot.com/whatsapp.php?phone=${encodeURIComponent(phone)}&text=${encodeURIComponent(text)}&apikey=${encodeURIComponent(apiKey)}`;
+  const res = await fetch(url);
+  if (!res.ok) throw new Error(`CallMeBot respondió ${res.status}: ${await res.text()}`);
+}
