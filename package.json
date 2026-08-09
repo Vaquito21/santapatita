@@ -1,0 +1,7 @@
+{
+  "name": "santapatita",
+  "private": true,
+  "engines": {
+    "node": ">=18.x"
+  }
+}

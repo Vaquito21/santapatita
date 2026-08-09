@@ -388,6 +388,9 @@
         <button class="btn btn--yellow btn--lg btn--full" id="orderBtn" onclick="sendOrder()">
           🛒 Pedir por WhatsApp
         </button>
+        <button class="btn btn--sky btn--lg btn--full" id="cardPayBtn" onclick="openIzipayCheckout()" style="margin-top:12px;">
+          💳 Pagar con tarjeta
+        </button>
       </div>
 
     </div>
@@ -805,5 +808,6 @@ document.querySelectorAll('a[href^="#"]').forEach(a => {
 const io = new IntersectionObserver(entries => entries.forEach(e => { if(e.isIntersecting) e.target.classList.add('visible'); }), {threshold:.1});
 document.querySelectorAll('.benefit-card,.store-card,.delivery-box,.flavor-card,.size-card').forEach(el => io.observe(el));
 </script>
+<script src="checkout-izipay.js"></script>
 </body>
 </html>

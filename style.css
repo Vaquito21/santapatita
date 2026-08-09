@@ -244,6 +244,21 @@ a { text-decoration: none; color: inherit; }
 }
 .modal-close:hover { color: #333; }
 .modal-title { font-family: 'Poppins', sans-serif; font-size: 1.8rem; font-weight: 700; color: var(--dark); margin-bottom: 40px; text-align: center; }
+
+/* ── Checkout Izipay ── */
+.izipay-modal-box { max-width: 460px; }
+.izipay-modal-box .modal-title { margin-bottom: 24px; font-size: 1.4rem; }
+.izipay-field { margin-bottom: 14px; text-align: left; }
+.izipay-field label { display: block; font-size: .82rem; font-weight: 700; color: var(--dark); margin-bottom: 6px; }
+.izipay-field__hint { font-weight: 500; color: var(--muted); font-size: .76rem; }
+.izipay-field input {
+  width: 100%; padding: 12px 14px; border: 2px solid var(--sky-l); border-radius: 12px;
+  font-family: 'Nunito', sans-serif; font-size: .95rem; color: var(--text); transition: var(--t);
+}
+.izipay-field input:focus { outline: none; border-color: var(--sky); }
+.izipay-error { color: #d64545; font-size: .85rem; font-weight: 700; margin-bottom: 14px; text-align: center; }
+.izipay-success-text { color: var(--text); font-size: .95rem; line-height: 1.6; margin-bottom: 24px; }
+#izipayContinueBtn:disabled { opacity: .6; cursor: not-allowed; }
 .tl { position: relative; padding: 0 20px; }
 .tl__line { position: absolute; left: 50%; transform: translateX(-50%); top: 0; bottom: 0; width: 3px; background: linear-gradient(to bottom, var(--sky), var(--sky-l)); border-radius: 2px; }
 .tl__item { display: flex; margin-bottom: 40px; position: relative; }
