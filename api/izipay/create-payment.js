@@ -1,4 +1,4 @@
-const { computeCartTotal } = require('../../lib/pricing');
+const { computeCartTotal, computeDeliveryFee } = require('../../lib/pricing');
 
 const IZIPAY_API_URL = 'https://api.micuentaweb.pe/api-payment/V4/Charge/CreatePayment';
 
@@ -20,10 +20,12 @@ module.exports = async (req, res) => {
   const body = req.body || {};
   const cart = body.cart;
   const customer = body.customer || {};
+  const delivery = body.delivery || {};
+  const deliveryType = delivery.type || 'pickup';
 
-  let total;
+  let subtotal;
   try {
-    total = computeCartTotal(cart);
+    subtotal = computeCartTotal(cart);
   } catch (err) {
     return res.status(400).json({ error: err.message });
   }
@@ -32,6 +34,18 @@ module.exports = async (req, res) => {
     return res.status(400).json({ error: 'Faltan datos del cliente (nombre, apellido, email o teléfono).' });
   }
 
+  if (deliveryType === 'delivery' && (!customer.address || !delivery.district)) {
+    return res.status(400).json({ error: 'Faltan el distrito o la dirección de entrega.' });
+  }
+
+  let deliveryFee;
+  try {
+    deliveryFee = computeDeliveryFee(deliveryType, delivery.district, delivery.date, subtotal);
+  } catch (err) {
+    return res.status(400).json({ error: err.message });
+  }
+
+  const total = subtotal + deliveryFee;
   const orderId = `SP${Date.now()}`;
 
   const payload = {

@@ -8,6 +8,7 @@
   let krLoadPromise = null;
   let submitHandlersAttached = false;
   let lastOrderId = null;
+  let lastAmount = null;
 
   function loadKrypton(publicKey) {
     if (krLoadPromise) return krLoadPromise;
@@ -44,7 +45,6 @@
           <div class="izipay-field"><label>Apellido</label><input type="text" id="izipayLastName" placeholder="Gómez"/></div>
           <div class="izipay-field"><label>Email</label><input type="email" id="izipayEmail" placeholder="maria@correo.com"/></div>
           <div class="izipay-field"><label>Teléfono</label><input type="tel" id="izipayPhone" placeholder="987654321"/></div>
-          <div class="izipay-field"><label>Dirección de entrega</label><input type="text" id="izipayAddress" placeholder="Av. Ejemplo 123, distrito"/></div>
           <div class="izipay-field"><label>DNI <span class="izipay-field__hint">(opcional, mejora la aprobación del pago)</span></label><input type="text" id="izipayDni" placeholder="12345678" maxlength="8"/></div>
           <p class="izipay-error" id="izipayError" style="display:none;"></p>
           <button type="button" class="btn btn--sky btn--full" id="izipayContinueBtn">Continuar al pago 🔒</button>
@@ -86,6 +86,14 @@
     const dateInput = document.getElementById('deliveryDate');
     if (!dateInput.value) { alert('🐾 ¡Elige la fecha de entrega!'); return; }
 
+    const deliveryType = document.querySelector('input[name=delivery]:checked').value;
+    if (deliveryType === 'delivery') {
+      const district = document.getElementById('districtSelect').value;
+      const address = document.getElementById('deliveryAddress').value.trim();
+      if (!district) { alert('🐾 ¡Elige tu distrito de entrega!'); return; }
+      if (!address)  { alert('🐾 ¡Escribe tu dirección exacta!'); return; }
+    }
+
     ensureModal();
     resetModalSteps();
     document.getElementById('izipayModal').classList.add('open');
@@ -101,8 +109,11 @@
     const lastName = document.getElementById('izipayLastName').value.trim();
     const email = document.getElementById('izipayEmail').value.trim();
     const phone = document.getElementById('izipayPhone').value.trim();
-    const address = document.getElementById('izipayAddress').value.trim();
     const dni = document.getElementById('izipayDni').value.trim();
+
+    const deliveryType = document.querySelector('input[name=delivery]:checked').value;
+    const district = deliveryType === 'delivery' ? document.getElementById('districtSelect').value : null;
+    const address = deliveryType === 'delivery' ? document.getElementById('deliveryAddress').value.trim() : '';
 
     document.getElementById('izipayError').style.display = 'none';
 
@@ -117,7 +128,8 @@
 
     const payload = {
       cart: cart.map(item => ({ flavor: item.flavor, units: item.units, qty: item.qty })),
-      customer: { firstName, lastName, email, phone, address, identityCode: dni || undefined },
+      customer: { firstName, lastName, email, phone, address, city: district || undefined, identityCode: dni || undefined },
+      delivery: { type: deliveryType, district, date: document.getElementById('deliveryDate').value },
     };
 
     let data;
@@ -137,6 +149,7 @@
     }
 
     lastOrderId = data.orderId;
+    lastAmount = data.amount;
 
     try {
       const KR = await loadKrypton(data.publicKey);
@@ -167,12 +180,20 @@
       document.getElementById('izipayStepPayment').style.display = 'none';
       document.getElementById('izipayStepSuccess').style.display = 'block';
 
-      const total = cartSubtotal();
+      const deliveryType = document.querySelector('input[name=delivery]:checked').value;
+      const district = document.getElementById('districtSelect').value;
+      const address = document.getElementById('deliveryAddress').value.trim();
+
       let msg = `¡Hola Santa Patita! 🐾 Ya pagué mi pedido con tarjeta ✅\n\n`;
       msg += `🧾 *N° de orden:* ${lastOrderId}\n`;
-      msg += `💰 *Total pagado:* S/ ${total}\n\n`;
+      msg += `💰 *Total pagado:* S/ ${lastAmount}\n\n`;
       msg += `🍖 *Pedido:*\n`;
       cart.forEach(item => { msg += `- ${item.flavor} × ${item.units}u × ${item.qty} paquete(s)\n`; });
+      msg += `🚚 *Tipo:* ${deliveryType === 'delivery' ? 'Delivery a domicilio' : 'Recojo en tienda'}\n`;
+      if (deliveryType === 'delivery') {
+        msg += `📍 *Distrito:* ${district}\n`;
+        msg += `🏠 *Dirección:* ${address}\n`;
+      }
       msg += `\n¿Pueden confirmarme la entrega? ¡Gracias!`;
 
       document.getElementById('izipayWhatsappBtn').href = 'https://wa.me/' + WHATSAPP_NUMBER + '?text=' + encodeURIComponent(msg);

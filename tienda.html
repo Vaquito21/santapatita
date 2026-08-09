@@ -198,6 +198,28 @@
         </div>
       </div>
 
+      <!-- PASO 6: DISTRITO Y DIRECCIÓN (solo delivery) -->
+      <div class="order-step" id="districtStep">
+        <div class="step-label"><span class="step-num">6</span> Distrito y dirección</div>
+        <select id="districtSelect" class="date-input" style="margin-bottom:12px;">
+          <option value="">Selecciona tu distrito</option>
+          <option value="Miraflores">Miraflores — S/ 12</option>
+          <option value="San Isidro">San Isidro — S/ 10</option>
+          <option value="Barranco">Barranco — S/ 12</option>
+          <option value="San Borja">San Borja — S/ 12</option>
+          <option value="Jesús María">Jesús María — S/ 7</option>
+          <option value="Lince">Lince — S/ 10</option>
+          <option value="Pueblo Libre">Pueblo Libre — S/ 7</option>
+          <option value="Magdalena">Magdalena — S/ 7</option>
+          <option value="San Miguel">San Miguel — S/ 7</option>
+          <option value="Surquillo">Surquillo — S/ 12</option>
+          <option value="Breña">Breña — S/ 7</option>
+          <option value="Cercado de Lima">Cercado de Lima — S/ 10</option>
+          <option value="La Victoria">La Victoria — S/ 12</option>
+        </select>
+        <input type="text" id="deliveryAddress" class="date-input" placeholder="Dirección exacta (calle, número, referencia)"/>
+      </div>
+
       <!-- RESUMEN + CTA -->
       <div class="order-summary" id="orderSummary">
         <div class="order-summary__detail">
@@ -208,6 +230,10 @@
           <div class="summary-row">
             <span>Fecha:</span>
             <strong id="sumDate">— elige arriba —</strong>
+          </div>
+          <div class="summary-row" id="sumDeliveryRow" style="display:none;">
+            <span>Delivery:</span>
+            <strong id="sumDelivery">S/ —</strong>
           </div>
           <div class="summary-row summary-row--total">
             <span>Total:</span>
@@ -297,6 +323,38 @@ const FLAVOR_PRICING = {
   'Blue Velvet': { 20: 25 },
   'Pink Velvet': { 20: 22 },
 };
+
+// ── Delivery por distrito ──
+const DISTRICT_FEES = {
+  'Pueblo Libre': 7, 'Breña': 7, 'Jesús María': 7, 'Magdalena': 7, 'San Miguel': 7,
+  'Cercado de Lima': 10, 'San Isidro': 10, 'Lince': 10,
+  'Miraflores': 12, 'Barranco': 12, 'San Borja': 12, 'Surquillo': 12, 'La Victoria': 12,
+};
+const FREE_SUNDAY_MIN = 27;
+
+function computeDeliveryFee(deliveryType, district, dateStr, subtotal) {
+  if (deliveryType === 'pickup') return 0;
+  const fee = DISTRICT_FEES[district];
+  if (fee === undefined) return 0;
+  const d = dateStr ? new Date(dateStr + 'T12:00:00') : null;
+  const isSunday = d && d.getDay() === 0;
+  if (isSunday && subtotal >= FREE_SUNDAY_MIN) return 0;
+  return fee;
+}
+
+const districtSelect = document.getElementById('districtSelect');
+const districtStep = document.getElementById('districtStep');
+
+function refreshDistrictStepVisibility() {
+  const deliveryType = document.querySelector('input[name=delivery]:checked').value;
+  districtStep.style.display = deliveryType === 'delivery' ? '' : 'none';
+}
+
+document.querySelectorAll('input[name=delivery]').forEach(inp => {
+  inp.addEventListener('change', () => { refreshDistrictStepVisibility(); updateSummary(); });
+});
+districtSelect.addEventListener('change', updateSummary);
+refreshDistrictStepVisibility();
 
 // ── Min date (today + 3 days) ──
 const dateInput = document.getElementById('deliveryDate');
@@ -442,15 +500,14 @@ dateInput.addEventListener('change', () => {
 
   if (day === 0) {
     banner.className = 'delivery-banner delivery-banner--free';
-    msg.innerHTML = '🎉 ¡Seleccionaste un <strong>domingo</strong>! El delivery es <strong>GRATIS</strong> en toda Lima Metropolitana.';
-    label.textContent = '¡GRATIS este domingo! 🎉';
+    msg.innerHTML = '🎉 ¡Seleccionaste un <strong>domingo</strong>! El delivery es <strong>GRATIS</strong> en pedidos desde S/ 27 en toda Lima Metropolitana.';
+    label.textContent = '¡GRATIS este domingo desde S/27! 🎉';
   } else {
     const days = ['domingo','lunes','martes','miércoles','jueves','viernes','sábado'];
     banner.className = 'delivery-banner delivery-banner--paid';
-    msg.innerHTML = `📦 Entrega el <strong>${days[day]}</strong>. El costo de delivery varía según tu distrito. Te lo confirmamos por WhatsApp.`;
-    label.textContent = 'Costo según distrito · Domingos GRATIS 🎉';
+    msg.innerHTML = `📦 Entrega el <strong>${days[day]}</strong>. El costo de delivery varía según tu distrito.`;
+    label.textContent = 'Costo según distrito · Domingos GRATIS desde S/27 🎉';
   }
-
   const formatted = d.toLocaleDateString('es-PE', { weekday:'long', day:'numeric', month:'long' });
   hint.textContent = '✅ ' + formatted.charAt(0).toUpperCase() + formatted.slice(1);
   updateSummary();
@@ -463,8 +520,21 @@ function updateSummary() {
     : '— agrega arriba —';
   const d = dateInput.value ? new Date(dateInput.value + 'T12:00:00').toLocaleDateString('es-PE', {weekday:'long',day:'numeric',month:'long'}) : '— elige arriba —';
   document.getElementById('sumDate').textContent   = d;
-  const total = cartSubtotal();
-  document.getElementById('sumTotal').textContent  = total ? 'S/ ' + total : 'S/ —';
+
+  const subtotal = cartSubtotal();
+  const deliveryType = document.querySelector('input[name=delivery]:checked').value;
+  const deliveryRow = document.getElementById('sumDeliveryRow');
+  let deliveryFee = 0;
+  if (deliveryType === 'delivery' && districtSelect.value) {
+    deliveryFee = computeDeliveryFee(deliveryType, districtSelect.value, dateInput.value, subtotal);
+    deliveryRow.style.display = 'flex';
+    document.getElementById('sumDelivery').textContent = deliveryFee === 0 ? 'GRATIS 🎉' : 'S/ ' + deliveryFee;
+  } else {
+    deliveryRow.style.display = 'none';
+  }
+
+  const total = subtotal + deliveryFee;
+  document.getElementById('sumTotal').textContent  = subtotal ? 'S/ ' + total : 'S/ —';
 }
 
 // ── Order ──
@@ -473,20 +543,30 @@ function sendOrder() {
   if (!dateInput.value)   { alert('🐾 ¡Elige la fecha de entrega!'); return; }
 
   const d = new Date(dateInput.value + 'T12:00:00');
-  const isSunday = d.getDay() === 0;
   const dateStr = d.toLocaleDateString('es-PE', {weekday:'long', day:'numeric', month:'long', year:'numeric'});
-  const total = cartSubtotal();
+  const subtotal = cartSubtotal();
   const deliveryType = document.querySelector('input[name=delivery]:checked').value;
+
+  if (deliveryType === 'delivery' && !districtSelect.value) { alert('🐾 ¡Elige tu distrito de entrega!'); return; }
+  if (deliveryType === 'delivery' && !document.getElementById('deliveryAddress').value.trim()) { alert('🐾 ¡Escribe tu dirección exacta!'); return; }
+
+  const deliveryFee = deliveryType === 'delivery' ? computeDeliveryFee(deliveryType, districtSelect.value, dateInput.value, subtotal) : 0;
+  const total = subtotal + deliveryFee;
 
   let msg = `¡Hola Santa Patita! 🐾 Quiero hacer un pedido:\n\n`;
   msg += `🍖 *Pedido:*\n`;
   cart.forEach(item => {
     msg += `- ${item.flavor} × ${item.units}u × ${item.qty} paquete(s) = S/ ${item.price * item.qty}\n`;
   });
-  msg += `💰 *Total producto:* S/ ${total}\n`;
+  msg += `💰 *Total productos:* S/ ${subtotal}\n`;
   msg += `📅 *Fecha de entrega:* ${dateStr}\n`;
   msg += `🚚 *Tipo:* ${deliveryType === 'delivery' ? 'Delivery a domicilio' : 'Recojo en tienda'}\n`;
-  if (deliveryType === 'delivery' && isSunday) msg += `🎉 *Delivery:* GRATIS (domingo)\n`;
+  if (deliveryType === 'delivery') {
+    msg += `📍 *Distrito:* ${districtSelect.value}\n`;
+    msg += `🏠 *Dirección:* ${document.getElementById('deliveryAddress').value.trim()}\n`;
+    msg += `🛵 *Delivery:* ${deliveryFee === 0 ? 'GRATIS 🎉' : 'S/ ' + deliveryFee}\n`;
+  }
+  msg += `💵 *Total a pagar:* S/ ${total}\n`;
   msg += `\n¿Pueden confirmarme el pedido? ¡Gracias!`;
 
   window.open('https://wa.me/51913897717?text=' + encodeURIComponent(msg), '_blank');
