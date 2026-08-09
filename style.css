@@ -477,12 +477,17 @@ a { text-decoration: none; color: inherit; }
 }
 .store-card__name { font-weight: 900; font-size: 1.05rem; color: var(--dark); margin-bottom: 10px; }
 .store-card__addr { font-size: .83rem; color: var(--muted); margin-bottom: 20px; line-height: 1.5; }
+.store-card__actions { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; }
 .store-card__btn {
-  display: inline-block; padding: 8px 20px; background: var(--sky-l);
+  display: inline-block; padding: 8px 18px; background: var(--sky-l);
   color: var(--sky-d); border-radius: 50px; font-weight: 900; font-size: .82rem;
   transition: var(--t); border: 2px solid var(--sky);
 }
 .store-card__btn:hover { background: var(--sky); color: white; }
+.store-card__btn--map {
+  background: transparent; color: var(--dark); border-color: #e0e0e0;
+}
+.store-card__btn--map:hover { background: var(--dark); color: white; border-color: var(--dark); }
 
 /* ═══════════════════════════════════════════ FOOTER ══ */
 .footer { background: var(--dark); position: relative; }
