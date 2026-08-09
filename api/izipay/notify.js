@@ -22,6 +22,8 @@ module.exports = async (req, res) => {
   const krHash = body['kr-hash'];
   const krHashKey = body['kr-hash-key']; // 'sha256_hmac' o 'password', según config de notificación en el back office Izipay
 
+  console.log('DEBUG kr-answer crudo:', krAnswer);
+
   if (!krAnswer || !krHash) {
     return res.status(400).send('Notificación incompleta.');
   }
