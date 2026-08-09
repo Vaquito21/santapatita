@@ -678,7 +678,7 @@ function refreshSizeCards() {
       priceEl.textContent = 'S/ ' + pricing[units];
       availableUnits.push(units);
     }
-    if (input.checked && available) sizeStillValid = true;
+    if (input.checked && available) { sizeStillValid = true; selectedPrice = pricing[units]; }
   });
 
   if (pricing && (selectedFlavor === 'Blue Velvet' || selectedFlavor === 'Pink Velvet')) {
