@@ -140,20 +140,21 @@
 
     try {
       const KR = await loadKrypton(data.publicKey);
-      await KR.setFormConfig({ formToken: data.formToken, 'kr-language': 'es-PE' });
-      const { KR: krInstance, result } = await KR.attachForm('#izipayFormZone');
-      await krInstance.showForm(result.formId);
-
-      if (!submitHandlersAttached) {
-        KR.onSubmit(onPaymentSubmit);
-        KR.onError(onPaymentError);
-        submitHandlersAttached = true;
-      }
 
       document.getElementById('izipayStepForm').style.display = 'none';
       document.getElementById('izipayStepPayment').style.display = 'block';
+
+      await KR.setFormToken(data.formToken);
+
+      if (!submitHandlersAttached) {
+        KR.onSubmit(onPaymentSubmit);
+        if (typeof KR.onError === 'function') KR.onError(onPaymentError);
+        submitHandlersAttached = true;
+      }
     } catch (err) {
-      showError('⚠️ ' + (err.message || 'No se pudo mostrar el formulario de pago.'));
+      document.getElementById('izipayStepPayment').style.display = 'none';
+      document.getElementById('izipayStepForm').style.display = 'block';
+      showError('⚠️ ' + ((err && err.message) || 'No se pudo mostrar el formulario de pago.'));
     } finally {
       btn.disabled = false;
       btn.textContent = 'Continuar al pago 🔒';
