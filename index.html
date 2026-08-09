@@ -369,6 +369,28 @@
         </div>
       </div>
 
+      <!-- PASO 6: DISTRITO Y DIRECCIÓN (solo delivery) -->
+      <div class="order-step" id="districtStep">
+        <div class="step-label"><span class="step-num">6</span> Distrito y dirección</div>
+        <select id="districtSelect" class="date-input" style="margin-bottom:12px;">
+          <option value="">Selecciona tu distrito</option>
+          <option value="Miraflores">Miraflores — S/ 12</option>
+          <option value="San Isidro">San Isidro — S/ 10</option>
+          <option value="Barranco">Barranco — S/ 12</option>
+          <option value="San Borja">San Borja — S/ 12</option>
+          <option value="Jesús María">Jesús María — S/ 7</option>
+          <option value="Lince">Lince — S/ 10</option>
+          <option value="Pueblo Libre">Pueblo Libre — S/ 7</option>
+          <option value="Magdalena">Magdalena — S/ 7</option>
+          <option value="San Miguel">San Miguel — S/ 7</option>
+          <option value="Surquillo">Surquillo — S/ 12</option>
+          <option value="Breña">Breña — S/ 7</option>
+          <option value="Cercado de Lima">Cercado de Lima — S/ 10</option>
+          <option value="La Victoria">La Victoria — S/ 12</option>
+        </select>
+        <input type="text" id="deliveryAddress" class="date-input" placeholder="Dirección exacta (calle, número, referencia)"/>
+      </div>
+
       <!-- RESUMEN + CTA -->
       <div class="order-summary" id="orderSummary">
         <div class="order-summary__detail">
@@ -379,6 +401,10 @@
           <div class="summary-row">
             <span>Fecha:</span>
             <strong id="sumDate">— elige arriba —</strong>
+          </div>
+          <div class="summary-row" id="sumDeliveryRow" style="display:none;">
+            <span>Delivery:</span>
+            <strong id="sumDelivery">S/ —</strong>
           </div>
           <div class="summary-row summary-row--total">
             <span>Total:</span>
@@ -430,7 +456,7 @@
       <p class="districts__note">🎉 Delivery GRATIS los domingos en todos estos distritos</p>
       <div class="districts__grid">
         <span>Miraflores</span><span>San Isidro</span><span>Barranco</span>
-        <span>Surco</span><span>San Borja</span>
+        <span>San Borja</span>
         <span>Jesús María</span><span>Lince</span><span>Pueblo Libre</span>
         <span>Magdalena</span><span>San Miguel</span><span>Surquillo</span>
         <span>Breña</span><span>Cercado de Lima</span><span>La Victoria</span>
