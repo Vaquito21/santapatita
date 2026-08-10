@@ -787,23 +787,34 @@ function renderCart() {
 }
 
 // ── Date ──
-dateInput.addEventListener('change', () => {
-  // El atributo min no siempre bloquea la selección de forma confiable en todos los navegadores
-  // móviles, así que validamos también en JS (fecha comparada a medianoche, sin hora de por medio).
-  const selectedMidnight = new Date(dateInput.value + 'T00:00:00');
+function isDeliveryDateValid(val) {
+  if (!val) return false;
+  const selectedMidnight = new Date(val + 'T00:00:00');
+  if (isNaN(selectedMidnight)) return false;
   const minMidnight = new Date(); minMidnight.setHours(0, 0, 0, 0); minMidnight.setDate(minMidnight.getDate() + 3);
-  if (selectedMidnight < minMidnight) {
-    alert('🐾 Necesitamos mínimo 3 días de anticipación para preparar tu pedido. Elige una fecha más adelante.');
-    dateInput.value = '';
+  return selectedMidnight >= minMidnight;
+}
+
+dateInput.addEventListener('change', () => {
+  const banner = document.getElementById('deliveryBanner');
+  const msg = document.getElementById('deliveryMsg');
+  const label = document.getElementById('deliveryCostLabel');
+  const hint = document.getElementById('dateHint');
+
+  // El atributo min no siempre bloquea la selección en todos los navegadores móviles (a veces el
+  // picker precarga "hoy"), así que solo avisamos acá — sin alert() ni limpiar el valor, para no
+  // interrumpir al usuario mientras sigue eligiendo. El bloqueo real ocurre recién al pedir/pagar.
+  if (!isDeliveryDateValid(dateInput.value)) {
+    banner.className = 'delivery-banner delivery-banner--invalid';
+    msg.innerHTML = '⚠️ Necesitamos <strong>mínimo 3 días</strong> de anticipación para preparar tu pedido. Elige otra fecha.';
+    label.textContent = 'Elige una fecha válida';
+    hint.textContent = '📅 Mínimo 3 días de anticipación';
+    updateSummary();
     return;
   }
 
   const d = new Date(dateInput.value + 'T12:00:00');
   const day = d.getDay(); // 0=Sunday
-  const banner = document.getElementById('deliveryBanner');
-  const msg = document.getElementById('deliveryMsg');
-  const label = document.getElementById('deliveryCostLabel');
-  const hint = document.getElementById('dateHint');
 
   if (day === 0) {
     banner.className = 'delivery-banner delivery-banner--free';
@@ -849,6 +860,7 @@ function updateSummary() {
 function sendOrder() {
   if (cart.length === 0)  { alert('🐾 ¡Agrega al menos un sabor a tu pedido!'); return; }
   if (!dateInput.value)   { alert('🐾 ¡Elige la fecha de entrega!'); return; }
+  if (!isDeliveryDateValid(dateInput.value)) { alert('🐾 Necesitamos mínimo 3 días de anticipación. Elige otra fecha.'); return; }
 
   const d = new Date(dateInput.value + 'T12:00:00');
   const dateStr = d.toLocaleDateString('es-PE', {weekday:'long', day:'numeric', month:'long', year:'numeric'});

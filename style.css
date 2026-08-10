@@ -422,6 +422,7 @@ a { text-decoration: none; color: inherit; }
 }
 .delivery-banner--free { background: #d1fae5; color: #065f46; border-color: #6ee7b7; }
 .delivery-banner--paid { background: #fef9c3; color: #713f12; border-color: #fde68a; }
+.delivery-banner--invalid { background: #fee2e2; color: #7f1d1d; border-color: #fca5a5; }
 
 /* Delivery types */
 .delivery-types { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }

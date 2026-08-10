@@ -85,6 +85,10 @@
     if (typeof cart === 'undefined' || cart.length === 0) { alert('🐾 ¡Agrega al menos un sabor a tu pedido!'); return; }
     const dateInput = document.getElementById('deliveryDate');
     if (!dateInput.value) { alert('🐾 ¡Elige la fecha de entrega!'); return; }
+    if (typeof isDeliveryDateValid === 'function' && !isDeliveryDateValid(dateInput.value)) {
+      alert('🐾 Necesitamos mínimo 3 días de anticipación. Elige otra fecha.');
+      return;
+    }
 
     const deliveryType = document.querySelector('input[name=delivery]:checked').value;
     if (deliveryType === 'delivery') {
