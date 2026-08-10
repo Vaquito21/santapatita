@@ -358,6 +358,7 @@ a { text-decoration: none; color: inherit; }
   padding: 20px 16px; border-radius: var(--radius); text-align: center;
   border: 3px solid #eef2f7; transition: var(--t);
   background: white; opacity: 0; transform: translateY(16px);
+  min-height: 200px; display: flex; flex-direction: column; justify-content: center;
 }
 .flavor-card.visible .flavor-card__inner { opacity: 1; transform: none; }
 .flavor-card:hover .flavor-card__inner { border-color: var(--sky); transform: translateY(-4px); box-shadow: var(--shadow); }
@@ -585,6 +586,10 @@ a { text-decoration: none; color: inherit; }
   .hero__mascot    { position: static; right: auto; bottom: auto; justify-content: center; margin-top: 12px; }
   .hero-dog-img    { max-height: 280px; }
   .mascot-circle   { width: 260px; height: 260px; }
+  .timeline::before { left: 20px; transform: none; }
+  .timeline__dot    { left: 20px; transform: none; }
+  .timeline__item--left, .timeline__item--right { flex-direction: row; }
+  .timeline__item--left .timeline__card, .timeline__item--right .timeline__card { width: 100%; margin-left: 44px; margin-right: 0; }
   .nav__links {
     display: none; position: fixed; top: 70px; left: 0; right: 0; transform: none;
     background: rgba(255,255,255,.98); flex-direction: column; padding: 20px;
