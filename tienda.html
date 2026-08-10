@@ -313,10 +313,34 @@
     <p>© 2026 Santa Patita · Snacks de colágeno natural · Hecho con 🐾 en Lima, Perú</p>
   </div>
 </footer>
+
+<!-- Barra de carrito sticky (solo mobile, visible cuando hay items) -->
+<div class="sticky-cart-bar" id="stickyCartBar">
+  <span id="stickyCartInfo">🛒 0 sabores</span>
+  <span>S/ <span id="stickyCartTotal">0</span> · Ver pedido →</span>
+</div>
+
 <script>
 // ── State ──
 let selectedFlavor = null, selectedUnits = null, selectedSize = null, selectedPrice = 0, qty = 1;
 let cart = [];
+
+// ── Carrito persistente (localStorage) ──
+const CART_STORAGE_KEY = 'santapatita_cart';
+
+function persistCart() {
+  try { localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(cart)); } catch (e) {}
+}
+
+function restoreCart() {
+  let saved;
+  try { saved = JSON.parse(localStorage.getItem(CART_STORAGE_KEY) || 'null'); } catch (e) { saved = null; }
+  if (Array.isArray(saved) && saved.length) {
+    cart = saved;
+    renderCart();
+    updateSummary();
+  }
+}
 
 // ── Precios por sabor + cantidad ──
 // Tradicional/Mixto/Zanahoria/Brócoli vienen en 5/10/20u. Blue Velvet y Pink Velvet solo en 20u.
@@ -467,6 +491,7 @@ document.getElementById('addFlavorBtn').addEventListener('click', () => {
 
   renderCart();
   updateSummary();
+  persistCart();
 });
 
 // ── Carrito ──
@@ -490,6 +515,7 @@ function renderCart() {
       cart.splice(parseInt(btn.dataset.index), 1);
       renderCart();
       updateSummary();
+      persistCart();
     });
   });
 }
@@ -561,6 +587,49 @@ function updateSummary() {
 
   const total = subtotal + deliveryFee;
   document.getElementById('sumTotal').textContent  = subtotal ? 'S/ ' + total : 'S/ —';
+
+  updateStickyCartBar();
+}
+
+// ── Barra de carrito sticky (mobile) ──
+function updateStickyCartBar() {
+  const bar = document.getElementById('stickyCartBar');
+  if (!bar) return;
+  const hasItems = cart.length > 0;
+  bar.classList.toggle('visible', hasItems);
+  document.body.classList.toggle('has-sticky-cart', hasItems);
+  if (hasItems) {
+    document.getElementById('stickyCartInfo').textContent = `🛒 ${cart.length} sabor${cart.length > 1 ? 'es' : ''}`;
+    document.getElementById('stickyCartTotal').textContent = cartSubtotal();
+  }
+}
+
+document.getElementById('stickyCartBar').addEventListener('click', () => {
+  document.getElementById('orderSummary').scrollIntoView({ behavior: 'smooth' });
+});
+
+// ── Modal de confirmación de pedido (WhatsApp) ──
+function showOrderConfirmModal(waUrl) {
+  let modal = document.getElementById('orderConfirmModal');
+  if (!modal) {
+    modal = document.createElement('div');
+    modal.className = 'modal-overlay';
+    modal.id = 'orderConfirmModal';
+    modal.innerHTML = `
+      <div class="modal-box" style="max-width:420px;text-align:center;">
+        <button type="button" class="modal-close" id="orderConfirmClose" aria-label="Cerrar">✕</button>
+        <p style="font-size:3rem;margin:0 0 10px;">🐾</p>
+        <h3 class="modal-title" style="margin-bottom:16px;">¡Pedido enviado!</h3>
+        <p style="margin-bottom:24px;color:#555;">Se abrió WhatsApp con tu pedido listo para enviar. Si no se abrió, usa el botón de abajo.</p>
+        <a class="btn btn--yellow btn--full" id="orderConfirmWaBtn" target="_blank">Abrir WhatsApp 🐾</a>
+      </div>
+    `;
+    document.body.appendChild(modal);
+    document.getElementById('orderConfirmClose').addEventListener('click', () => modal.classList.remove('open'));
+    modal.addEventListener('click', (e) => { if (e.target === modal) modal.classList.remove('open'); });
+  }
+  document.getElementById('orderConfirmWaBtn').href = waUrl;
+  modal.classList.add('open');
 }
 
 // ── Order ──
@@ -598,7 +667,9 @@ function sendOrder() {
   msg += `💵 *Total a pagar:* S/ ${total}\n`;
   msg += `\n¿Pueden confirmarme el pedido? ¡Gracias!`;
 
-  window.open('https://wa.me/51913897717?text=' + encodeURIComponent(msg), '_blank');
+  const waUrl = 'https://wa.me/51913897717?text=' + encodeURIComponent(msg);
+  window.open(waUrl, '_blank');
+  showOrderConfirmModal(waUrl);
 }
 
 // ── Nav scroll ──
@@ -624,6 +695,8 @@ document.querySelectorAll('a[href^="#"]').forEach(a => {
 // ── Animate on scroll ──
 const io = new IntersectionObserver(entries => entries.forEach(e => { if(e.isIntersecting) e.target.classList.add('visible'); }), {threshold:.1});
 document.querySelectorAll('.benefit-card,.store-card,.delivery-box,.flavor-card,.size-card').forEach(el => io.observe(el));
+
+restoreCart();
 </script>
 <script src="delivery-map.js"></script>
 <script src="checkout-izipay.js"></script>

@@ -4,11 +4,37 @@
   const KRYPTON_JS_URL = 'https://static.micuentaweb.pe/static/js/krypton-client/V4.0/stable/kr-payment-form.min.js';
   const KRYPTON_CSS_URL = 'https://static.micuentaweb.pe/static/js/krypton-client/V4.0/ext/classic.css';
   const WHATSAPP_NUMBER = '51913897717';
+  const CUSTOMER_STORAGE_KEY = 'santapatita_customer';
 
   let krLoadPromise = null;
   let submitHandlersAttached = false;
   let lastOrderId = null;
   let lastAmount = null;
+
+  // ── Recordar datos del cliente (nombre/email/tel/dirección/distrito) ──
+  function saveCustomerData(data) {
+    try { localStorage.setItem(CUSTOMER_STORAGE_KEY, JSON.stringify(data)); } catch (e) {}
+  }
+
+  function restoreCustomerData() {
+    let saved;
+    try { saved = JSON.parse(localStorage.getItem(CUSTOMER_STORAGE_KEY) || 'null'); } catch (e) { saved = null; }
+    if (!saved) return;
+
+    const addressEl = document.getElementById('deliveryAddress');
+    const districtEl = document.getElementById('districtSelect');
+    if (addressEl && !addressEl.value && saved.address) addressEl.value = saved.address;
+    if (districtEl && !districtEl.value && saved.district) districtEl.value = saved.district;
+
+    const firstNameEl = document.getElementById('izipayFirstName');
+    const lastNameEl = document.getElementById('izipayLastName');
+    const emailEl = document.getElementById('izipayEmail');
+    const phoneEl = document.getElementById('izipayPhone');
+    if (firstNameEl && !firstNameEl.value && saved.firstName) firstNameEl.value = saved.firstName;
+    if (lastNameEl && !lastNameEl.value && saved.lastName) lastNameEl.value = saved.lastName;
+    if (emailEl && !emailEl.value && saved.email) emailEl.value = saved.email;
+    if (phoneEl && !phoneEl.value && saved.phone) phoneEl.value = saved.phone;
+  }
 
   function loadKrypton(publicKey) {
     if (krLoadPromise) return krLoadPromise;
@@ -66,6 +92,8 @@
     document.getElementById('izipayModalClose').addEventListener('click', closeIzipayModal);
     overlay.addEventListener('click', (e) => { if (e.target === overlay) closeIzipayModal(); });
     document.getElementById('izipayContinueBtn').addEventListener('click', startPayment);
+
+    restoreCustomerData();
   }
 
   function showError(msg) {
@@ -125,6 +153,8 @@
       showError('🐾 Completa nombre, apellido, email y teléfono para continuar.');
       return;
     }
+
+    saveCustomerData({ firstName, lastName, email, phone, address, district });
 
     const btn = document.getElementById('izipayContinueBtn');
     btn.disabled = true;
@@ -207,6 +237,7 @@
 
       document.getElementById('izipayWhatsappBtn').href = 'https://wa.me/' + WHATSAPP_NUMBER + '?text=' + encodeURIComponent(msg);
       cart.length = 0;
+      try { localStorage.removeItem('santapatita_cart'); } catch (e) {}
       if (typeof renderCart === 'function') renderCart();
       if (typeof updateSummary === 'function') updateSummary();
     } else {
@@ -222,4 +253,6 @@
     document.getElementById('izipayStepForm').style.display = 'block';
     showError('⚠️ ' + (error && error.errorMessage ? error.errorMessage : 'Ocurrió un error con el pago.'));
   }
+
+  restoreCustomerData();
 })();

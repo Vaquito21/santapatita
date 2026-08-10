@@ -578,6 +578,9 @@ a { text-decoration: none; color: inherit; }
   50%      { box-shadow: 0 4px 32px rgba(37,211,102,.8), 0 0 0 12px rgba(37,211,102,.1); }
 }
 
+/* ═══════════════════════════════════════════ STICKY CART BAR ══ */
+.sticky-cart-bar { display: none; cursor: pointer; }
+
 /* ═══════════════════════════════════════════ RESPONSIVE ══ */
 @media (max-width: 1024px) {
   .benefits__grid  { grid-template-columns: repeat(2,1fr); }
@@ -616,6 +619,13 @@ a { text-decoration: none; color: inherit; }
   .benefits__grid  { grid-template-columns: 1fr; }
   .stores-grid     { grid-template-columns: 1fr 1fr; }
   .footer__inner   { flex-direction: column; gap: 28px; }
+  .sticky-cart-bar.visible {
+    display: flex; position: fixed; bottom: 0; left: 0; right: 0; z-index: 999;
+    background: var(--sky); color: white; padding: 14px 20px;
+    align-items: center; justify-content: space-between; font-weight: 800;
+    box-shadow: 0 -4px 20px rgba(0,0,0,.15);
+  }
+  body.has-sticky-cart .wa-float { bottom: 90px; }
 }
 
 @media (max-width: 480px) {
