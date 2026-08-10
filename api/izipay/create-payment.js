@@ -1,4 +1,4 @@
-const { computeCartTotal, computeDeliveryFee } = require('../../lib/pricing');
+const { computeCartTotal, computeDeliveryFee, validateDeliveryDate } = require('../../lib/pricing');
 
 const IZIPAY_API_URL = 'https://api.micuentaweb.pe/api-payment/V4/Charge/CreatePayment';
 
@@ -36,6 +36,12 @@ module.exports = async (req, res) => {
 
   if (deliveryType === 'delivery' && (!customer.address || !delivery.district)) {
     return res.status(400).json({ error: 'Faltan el distrito o la dirección de entrega.' });
+  }
+
+  try {
+    validateDeliveryDate(delivery.date);
+  } catch (err) {
+    return res.status(400).json({ error: err.message });
   }
 
   let deliveryFee;

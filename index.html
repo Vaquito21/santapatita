@@ -788,6 +788,16 @@ function renderCart() {
 
 // ── Date ──
 dateInput.addEventListener('change', () => {
+  // El atributo min no siempre bloquea la selección de forma confiable en todos los navegadores
+  // móviles, así que validamos también en JS (fecha comparada a medianoche, sin hora de por medio).
+  const selectedMidnight = new Date(dateInput.value + 'T00:00:00');
+  const minMidnight = new Date(); minMidnight.setHours(0, 0, 0, 0); minMidnight.setDate(minMidnight.getDate() + 3);
+  if (selectedMidnight < minMidnight) {
+    alert('🐾 Necesitamos mínimo 3 días de anticipación para preparar tu pedido. Elige una fecha más adelante.');
+    dateInput.value = '';
+    return;
+  }
+
   const d = new Date(dateInput.value + 'T12:00:00');
   const day = d.getDay(); // 0=Sunday
   const banner = document.getElementById('deliveryBanner');
