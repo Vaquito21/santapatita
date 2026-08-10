@@ -351,6 +351,11 @@ a { text-decoration: none; color: inherit; }
 }
 
 /* Flavors */
+.flavor-video {
+  width: 100%; max-height: 260px; object-fit: cover;
+  border-radius: var(--radius-lg); margin-bottom: 20px; display: block;
+  box-shadow: var(--shadow);
+}
 .flavors-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 16px; }
 .flavor-card { cursor: pointer; }
 .flavor-card input { display: none; }
@@ -602,6 +607,7 @@ a { text-decoration: none; color: inherit; }
   .nav__burger     { display: flex; }
   .nav .btn--yellow { display: none; }
   .flavors-grid    { grid-template-columns: repeat(2,1fr); }
+  .flavor-video    { max-height: 200px; }
   .sizes-grid      { grid-template-columns: 1fr; }
   .delivery-types  { grid-template-columns: 1fr; }
   .delivery-info   { grid-template-columns: 1fr; }
