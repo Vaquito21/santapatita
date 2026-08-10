@@ -521,7 +521,8 @@ a { text-decoration: none; color: inherit; }
   letter-spacing: .1em; color: var(--sky-d); margin-bottom: 6px;
 }
 .store-card__name { font-weight: 900; font-size: 1.05rem; color: var(--dark); margin-bottom: 10px; }
-.store-card__addr { font-size: .83rem; color: var(--muted); margin-bottom: 20px; line-height: 1.5; }
+.store-card__addr { font-size: .83rem; color: var(--muted); margin-bottom: 8px; line-height: 1.5; }
+.store-card__hours { font-size: .8rem; color: var(--sky-d); font-weight: 700; margin-bottom: 20px; line-height: 1.5; }
 .store-card__actions { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; }
 .store-card__btn {
   display: inline-block; padding: 8px 18px; background: var(--sky-l);
