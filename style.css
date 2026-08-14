@@ -649,12 +649,15 @@ a { text-decoration: none; color: inherit; }
   .timeline__item--left, .timeline__item--right { flex-direction: row; }
   .timeline__item--left .timeline__card, .timeline__item--right .timeline__card { width: 100%; margin-left: 44px; margin-right: 0; }
   .nav__links {
-    display: none; position: fixed; top: 70px; left: 0; right: 0; transform: none;
-    background: rgba(255,255,255,.98); flex-direction: column; padding: 20px;
-    gap: 0; list-style: none;
+    display: none; position: absolute; top: 100%; left: 0; right: 0; transform: none;
+    background: #ffffff; flex-direction: column; padding: 20px;
+    gap: 0; list-style: none; box-shadow: 0 12px 24px rgba(0,0,0,.12);
   }
   .nav__links.open { display: flex; }
-  .nav__links a    { display: block; padding: 14px 0; color: var(--dark); border-bottom: 1px solid #eef2f7; }
+  .nav__links a, .nav--scrolled .nav__links a {
+    display: block; padding: 14px 0; color: var(--dark); border-bottom: 1px solid #eef2f7;
+  }
+  .nav--scrolled .nav__links a:hover, .nav__links a:hover { color: var(--sky-d); }
   .nav__burger     { display: flex; }
   .nav .btn--yellow { display: none; }
   .flavors-grid    { grid-template-columns: repeat(2,1fr); }
