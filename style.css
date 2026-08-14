@@ -238,6 +238,8 @@ a { text-decoration: none; color: inherit; }
   max-width: 700px; width: 90%; max-height: 85vh; overflow-y: auto;
   position: relative; box-shadow: 0 20px 60px rgba(0,0,0,.2);
 }
+.modal-overlay.open .modal-box { animation: modalPopIn .35s cubic-bezier(.34,1.56,.64,1); }
+@keyframes modalPopIn { from { opacity: 0; transform: scale(.92) translateY(12px); } to { opacity: 1; transform: scale(1) translateY(0); } }
 .modal-close {
   position: absolute; top: 16px; right: 20px;
   background: none; border: none; font-size: 1.4rem; cursor: pointer; color: #999;
@@ -246,8 +248,15 @@ a { text-decoration: none; color: inherit; }
 .modal-title { font-family: 'Poppins', sans-serif; font-size: 1.8rem; font-weight: 700; color: var(--dark); margin-bottom: 40px; text-align: center; }
 
 /* ── Checkout Izipay ── */
-.izipay-modal-box { max-width: 460px; }
-.izipay-modal-box .modal-title { margin-bottom: 24px; font-size: 1.4rem; }
+.izipay-modal-box { max-width: 460px; border: 3px solid var(--sky-l); }
+.izipay-modal-box .modal-title { margin-bottom: 8px; font-size: 1.4rem; }
+.izipay-modal-icon {
+  width: 56px; height: 56px; border-radius: 50%; background: var(--sky-l); color: var(--sky-d);
+  display: flex; align-items: center; justify-content: center; font-size: 1.6rem;
+  margin: 0 auto 14px; animation: iconPop .5s cubic-bezier(.34,1.56,.64,1);
+}
+@keyframes iconPop { from { transform: scale(0); } to { transform: scale(1); } }
+.izipay-lock-hint { text-align: center; font-size: .78rem; color: var(--muted); font-weight: 700; margin-bottom: 24px; }
 .izipay-field { margin-bottom: 14px; text-align: left; }
 .izipay-field label { display: block; font-size: .82rem; font-weight: 700; color: var(--dark); margin-bottom: 6px; }
 .izipay-field__hint { font-weight: 500; color: var(--muted); font-size: .76rem; }
@@ -259,6 +268,18 @@ a { text-decoration: none; color: inherit; }
 .izipay-error { color: #d64545; font-size: .85rem; font-weight: 700; margin-bottom: 14px; text-align: center; }
 .izipay-success-text { color: var(--text); font-size: .95rem; line-height: 1.6; margin-bottom: 24px; }
 #izipayContinueBtn:disabled { opacity: .6; cursor: not-allowed; }
+
+/* Tema del widget de pago embebido (Krypton/Izipay) — --kr-global-color-primary
+   es la variable oficial de personalización de color; el resto de los campos
+   (número de tarjeta, CVV) están aislados por PCI y no se pueden restylear. */
+.kr-embedded { --kr-global-color-primary: #2596e4; margin-top: 4px; }
+.kr-embedded .kr-payment-button {
+  border-radius: 50px !important; font-weight: 800 !important;
+  box-shadow: 0 8px 24px rgba(37,150,228,.35) !important; transition: transform .2s ease !important;
+}
+.kr-embedded .kr-payment-button:hover { transform: translateY(-2px); }
+.izipay-success-icon { font-size: 3rem; margin: 0 0 10px; animation: successBounce .6s cubic-bezier(.34,1.56,.64,1); }
+@keyframes successBounce { 0% { transform: scale(0) rotate(-10deg); opacity: 0; } 60% { transform: scale(1.15) rotate(5deg); } 100% { transform: scale(1) rotate(0); opacity: 1; } }
 .tl { position: relative; padding: 0 20px; }
 .tl__line { position: absolute; left: 50%; transform: translateX(-50%); top: 0; bottom: 0; width: 3px; background: linear-gradient(to bottom, var(--sky), var(--sky-l)); border-radius: 2px; }
 .tl__item { display: flex; margin-bottom: 40px; position: relative; }

@@ -144,7 +144,10 @@ function extractOrderInfo(transaction) {
 
 function cartItemLine(i) {
   const priceText = typeof i.a === 'number' ? ` — S/ ${i.a}` : '';
-  return `${i.f} × ${i.u}u × ${i.q} paquete(s)${priceText}`;
+  // "× 1 paquete(s)" es ruido en el caso común (una sola unidad) y hacía que
+  // líneas con nombres largos ("Tradicional") se cortaran en dos en WhatsApp.
+  const qtyText = i.q > 1 ? ` × ${i.q} paquetes` : '';
+  return `${i.f} × ${i.u}u${qtyText}${priceText}`;
 }
 
 // format 'html' -> lista <ul>/<li> para el correo; format 'text' (default) ->
@@ -186,14 +189,23 @@ function amountBreakdown(d) {
 // tarjetas redondeadas) — con estilos inline porque los clientes de correo
 // ignoran <style> y no soportan flexbox/grid, solo CSS inline y tablas. ──
 function emailShell({ eyebrow, title, subtitle, bodyHtml, ctaHref, ctaLabel }) {
-  return `
+  return `<!doctype html>
+  <html>
+  <head>
+    <meta charset="utf-8"/>
+    <meta name="color-scheme" content="light"/>
+    <meta name="supported-color-schemes" content="light"/>
+  </head>
+  <body style="margin:0;padding:0;background:#F5F7FA;">
   <div style="background:#F5F7FA;padding:32px 12px;font-family:Arial,Helvetica,sans-serif;">
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:560px;margin:0 auto;background:#ffffff;border-radius:20px;overflow:hidden;border:1px solid #eef2f7;">
       <tr>
         <td style="background:#2596e4;background:linear-gradient(135deg,#2596e4,#3aaee8);padding:32px 24px;text-align:center;">
-          <div style="display:inline-block;background:#ffffff;border-radius:14px;padding:8px 16px;">
-            <img src="https://santapatita.pe/logo.png" width="150" height="72" alt="Santa Patita" style="display:block;max-width:150px;height:auto;"/>
-          </div>
+          <table role="presentation" cellpadding="0" cellspacing="0" align="center" bgcolor="#ffffff" style="display:inline-block;background-color:#ffffff !important;border-radius:14px;">
+            <tr><td style="padding:8px 16px;">
+              <img src="https://santapatita.pe/logo.png" width="150" height="72" alt="Santa Patita" style="display:block;max-width:150px;height:auto;"/>
+            </td></tr>
+          </table>
           ${eyebrow ? `<div style="color:#ffffff;opacity:.85;font-size:12px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;margin-top:14px;">${eyebrow}</div>` : ''}
           <div style="color:#ffffff;font-size:22px;font-weight:800;margin-top:4px;">${title}</div>
           ${subtitle ? `<div style="color:#ffffff;opacity:.9;font-size:13px;margin-top:6px;">${subtitle}</div>` : ''}
@@ -215,7 +227,9 @@ function emailShell({ eyebrow, title, subtitle, bodyHtml, ctaHref, ctaLabel }) {
         </td>
       </tr>
     </table>
-  </div>`;
+  </div>
+  </body>
+  </html>`;
 }
 
 function infoCard(innerHtml, opts = {}) {

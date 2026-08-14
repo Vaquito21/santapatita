@@ -64,7 +64,9 @@
     overlay.innerHTML = `
       <div class="modal-box izipay-modal-box">
         <button type="button" class="modal-close" id="izipayModalClose" aria-label="Cerrar">✕</button>
-        <h3 class="modal-title">💳 Pagar con tarjeta</h3>
+        <div class="izipay-modal-icon">💳</div>
+        <h3 class="modal-title">Pagar con tarjeta</h3>
+        <p class="izipay-lock-hint">🔒 Pago seguro procesado por Izipay</p>
 
         <div id="izipayStepForm">
           <div class="izipay-field"><label>Nombre</label><input type="text" id="izipayFirstName" placeholder="María"/></div>
@@ -81,7 +83,7 @@
         </div>
 
         <div id="izipayStepSuccess" style="display:none; text-align:center;">
-          <p style="font-size:3rem;margin:0 0 10px;">🎉</p>
+          <p class="izipay-success-icon">🎉</p>
           <p class="izipay-success-text">¡Pago realizado con éxito! Confírmanos tu pedido por WhatsApp para coordinar la entrega.</p>
           <a class="btn btn--yellow btn--full" id="izipayWhatsappBtn" target="_blank">Confirmar por WhatsApp</a>
         </div>
