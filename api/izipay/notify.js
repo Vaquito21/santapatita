@@ -182,39 +182,97 @@ function amountBreakdown(d) {
   };
 }
 
+// ── Plantilla de correo con la identidad visual del sitio (colores, logo,
+// tarjetas redondeadas) — con estilos inline porque los clientes de correo
+// ignoran <style> y no soportan flexbox/grid, solo CSS inline y tablas. ──
+function emailShell({ eyebrow, title, subtitle, bodyHtml, ctaHref, ctaLabel }) {
+  return `
+  <div style="background:#F5F7FA;padding:32px 12px;font-family:Arial,Helvetica,sans-serif;">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:560px;margin:0 auto;background:#ffffff;border-radius:20px;overflow:hidden;border:1px solid #eef2f7;">
+      <tr>
+        <td style="background:#2596e4;background:linear-gradient(135deg,#2596e4,#3aaee8);padding:32px 24px;text-align:center;">
+          <img src="https://santapatita.pe/logo.png" width="52" height="52" alt="Santa Patita" style="border-radius:50%;background:#ffffff;padding:6px;display:inline-block;"/>
+          ${eyebrow ? `<div style="color:#ffffff;opacity:.85;font-size:12px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;margin-top:14px;">${eyebrow}</div>` : ''}
+          <div style="color:#ffffff;font-size:22px;font-weight:800;margin-top:4px;">${title}</div>
+          ${subtitle ? `<div style="color:#ffffff;opacity:.9;font-size:13px;margin-top:6px;">${subtitle}</div>` : ''}
+        </td>
+      </tr>
+      <tr>
+        <td style="padding:28px 24px;color:#2d2d44;font-size:14px;line-height:1.65;">
+          ${bodyHtml}
+          ${ctaHref ? `
+          <div style="text-align:center;margin-top:24px;">
+            <a href="${ctaHref}" style="display:inline-block;background:#F7C618;color:#1A1A2E;font-weight:800;font-size:14px;padding:12px 28px;border-radius:50px;text-decoration:none;">${ctaLabel}</a>
+          </div>` : ''}
+        </td>
+      </tr>
+      <tr>
+        <td style="background:#1A1A2E;padding:20px 24px;text-align:center;">
+          <div style="color:#F7C618;font-size:12px;font-weight:800;">🐾 Santa Patita</div>
+          <div style="color:#8a8aa8;font-size:11px;margin-top:6px;">Suplemento de colágeno natural para perros · Hecho en Lima, Perú</div>
+        </td>
+      </tr>
+    </table>
+  </div>`;
+}
+
+function infoCard(innerHtml, opts = {}) {
+  const bg = opts.accent === 'yellow' ? '#fff8dc' : '#eaf4fc';
+  const border = opts.accent === 'yellow' ? '#fde68a' : '#bfe0f7';
+  return `<div style="background:${bg};border:1px solid ${border};border-radius:14px;padding:16px 18px;margin:14px 0;">${innerHtml}</div>`;
+}
+
+function amountRowsHtml(b) {
+  if (!b.hasBreakdown) {
+    return `<table role="presentation" width="100%" style="font-size:14px;"><tr><td style="padding:4px 0;color:#7C7C9A;">Total pagado</td><td style="padding:4px 0;text-align:right;font-weight:800;color:#1A1A2E;">${b.totalText}</td></tr></table>`;
+  }
+  return `<table role="presentation" width="100%" style="font-size:14px;">
+    <tr><td style="padding:4px 0;color:#7C7C9A;">Producto</td><td style="padding:4px 0;text-align:right;color:#2d2d44;">${b.productText}</td></tr>
+    <tr><td style="padding:4px 0;color:#7C7C9A;">Envío</td><td style="padding:4px 0;text-align:right;color:#2d2d44;">${b.shippingText}</td></tr>
+    <tr><td style="padding:8px 0 0;border-top:1px solid #e2e8f0;font-weight:800;color:#1A1A2E;">Total</td><td style="padding:8px 0 0;border-top:1px solid #e2e8f0;text-align:right;font-weight:800;color:#1a7abf;font-size:16px;">${b.totalText}</td></tr>
+  </table>`;
+}
+
 async function notifyEmail(d) {
   const apiKey = process.env.RESEND_API_KEY;
   const to = process.env.NOTIFY_EMAIL_TO;
   if (!apiKey || !to) return;
 
   const b = amountBreakdown(d);
-  const amountLines = b.hasBreakdown
-    ? `<p>Monto producto: <strong>${b.productText}</strong></p>
-        <p>Monto envío: <strong>${b.shippingText}</strong></p>
-        <p>Monto total: <strong>${b.totalText}</strong></p>`
-    : `<p>Monto: <strong>${b.totalText}</strong></p>`;
-  const mapLink = d.lat && d.lng ? `<p>Ubicación (mapa): <a href="https://www.google.com/maps?q=${d.lat},${d.lng}">ver en Google Maps</a></p>` : '';
-  const subjectPrefix = d.type === 'subscription' ? '🐾 Nueva suscripción pagada' : '🐾 Nuevo pago recibido';
-  const pedidoBlock = d.type === 'subscription'
-    ? `<p>Pedido: <strong>${orderSummary(d)}</strong></p>`
-    : `<p>Pedido:</p>${orderSummary(d, 'html')}`;
+  const isSubscription = d.type === 'subscription';
+  const pedidoBlock = isSubscription
+    ? `<div>${orderSummary(d)}</div>`
+    : orderSummary(d, 'html');
+  const mapLink = d.lat && d.lng
+    ? `<p style="margin:12px 0 0;"><a href="https://www.google.com/maps?q=${d.lat},${d.lng}" style="color:#1a7abf;font-weight:700;text-decoration:none;">🗺️ Ver ubicación en Google Maps</a></p>`
+    : '';
+  const detailsRows = `<table role="presentation" width="100%" style="font-size:13px;">
+    <tr><td style="padding:4px 0;color:#7C7C9A;width:110px;">Cliente</td><td style="padding:4px 0;font-weight:700;color:#1A1A2E;">${d.name || 'No disponible'}</td></tr>
+    <tr><td style="padding:4px 0;color:#7C7C9A;">Teléfono</td><td style="padding:4px 0;font-weight:700;color:#1A1A2E;">${d.phone || 'No disponible'}</td></tr>
+    <tr><td style="padding:4px 0;color:#7C7C9A;">Email</td><td style="padding:4px 0;color:#2d2d44;">${d.email || 'No disponible'}</td></tr>
+    <tr><td style="padding:4px 0;color:#7C7C9A;">Entrega</td><td style="padding:4px 0;color:#2d2d44;">${d.deliveryType === 'delivery' ? 'Delivery' : 'Recojo en tienda'}${d.district ? ' — ' + d.district : ''}</td></tr>
+    <tr><td style="padding:4px 0;color:#7C7C9A;vertical-align:top;">Dirección</td><td style="padding:4px 0;color:#2d2d44;">${d.address || 'No disponible (revisar con el cliente)'}</td></tr>
+  </table>`;
+
+  const bodyHtml = `
+    ${infoCard(`<div style="font-size:12px;color:#7C7C9A;font-weight:700;text-transform:uppercase;margin-bottom:6px;">N° de orden ${d.orderId}</div>${pedidoBlock}`)}
+    ${infoCard(amountRowsHtml(b), { accent: 'yellow' })}
+    ${infoCard(detailsRows)}
+    ${mapLink}
+  `;
+
   const res = await fetch('https://api.resend.com/emails', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${apiKey}` },
     body: JSON.stringify({
       from: SENDER_EMAIL,
       to: [to],
-      subject: `${subjectPrefix} — ${d.orderId}`,
-      html: `<p><strong>¡Nuevo pago confirmado!</strong></p>
-        <p>N° de orden: <strong>${d.orderId}</strong></p>
-        ${amountLines}
-        ${pedidoBlock}
-        <p>Cliente: <strong>${d.name || 'No disponible'}</strong></p>
-        <p>Teléfono / WhatsApp: <strong>${d.phone || 'No disponible'}</strong></p>
-        <p>Email: ${d.email || 'No disponible'}</p>
-        <p>Entrega: ${d.deliveryType === 'delivery' ? 'Delivery' : 'Recojo en tienda'}${d.district ? ' — ' + d.district : ''}</p>
-        <p>Dirección: <strong>${d.address || 'No disponible (revisar con el cliente)'}</strong></p>
-        ${mapLink}`,
+      subject: `${isSubscription ? '🐾 Nueva suscripción pagada' : '🐾 Nuevo pago recibido'} — ${d.orderId}`,
+      html: emailShell({
+        eyebrow: isSubscription ? 'Suscripción' : 'Pago recibido',
+        title: '💰 ¡Nuevo pago confirmado!',
+        bodyHtml,
+      }),
     }),
   });
   if (!res.ok) throw new Error(`Resend respondió ${res.status}: ${await res.text()}`);
@@ -230,17 +288,21 @@ async function notifyCustomerEmail(d) {
   const firstName = d.name ? d.name.split(' ')[0] : null;
   const greeting = firstName ? `¡Hola ${firstName}! 🐾` : '¡Hola! 🐾';
 
-  const amountLines = b.hasBreakdown
-    ? `<p>Producto: <strong>${b.productText}</strong><br/>Envío: <strong>${b.shippingText}</strong><br/>Total: <strong>${b.totalText}</strong></p>`
-    : `<p>Total pagado: <strong>${b.totalText}</strong></p>`;
   const pedidoBlock = isSubscription
-    ? `<p>${orderSummary(d)}</p>`
+    ? `<div>${orderSummary(d)}</div>`
     : orderSummary(d, 'html');
-  const entregaLine = `<p>Entrega: ${d.deliveryType === 'delivery' ? 'Delivery' : 'Recojo en tienda'}${d.district ? ' — ' + d.district : ''}${d.address ? ' — ' + d.address : ''}</p>`;
-  const subject = isSubscription ? '🐾 ¡Tu suscripción a Santa Patita está activa!' : '🐾 ¡Gracias por tu compra en Santa Patita!';
   const intro = isSubscription
     ? 'Tu suscripción quedó activa. Este es el resumen de tu primer ciclo:'
     : '¡Recibimos tu pago! Este es el resumen de tu pedido:';
+
+  const bodyHtml = `
+    <p style="margin:0 0 4px;font-size:16px;font-weight:800;color:#1A1A2E;">${greeting}</p>
+    <p style="margin:0 0 4px;color:#7C7C9A;">${intro}</p>
+    ${infoCard(`<div style="font-size:12px;color:#7C7C9A;font-weight:700;text-transform:uppercase;margin-bottom:6px;">N° de orden ${d.orderId}</div>${pedidoBlock}`)}
+    ${infoCard(amountRowsHtml(b), { accent: 'yellow' })}
+    <p style="margin:16px 0 0;">📍 <strong>Entrega:</strong> ${d.deliveryType === 'delivery' ? 'Delivery' : 'Recojo en tienda'}${d.district ? ' — ' + d.district : ''}${d.address ? ' — ' + d.address : ''}</p>
+    <p style="margin:16px 0 0;color:#7C7C9A;font-size:13px;">¿Alguna consulta? Escríbenos, con gusto te ayudamos 🐾</p>
+  `;
 
   const res = await fetch('https://api.resend.com/emails', {
     method: 'POST',
@@ -248,15 +310,15 @@ async function notifyCustomerEmail(d) {
     body: JSON.stringify({
       from: SENDER_EMAIL,
       to: [d.email],
-      subject,
-      html: `<p>${greeting}</p>
-        <p>${intro}</p>
-        <p>N° de orden: <strong>${d.orderId}</strong></p>
-        ${pedidoBlock}
-        ${amountLines}
-        ${entregaLine}
-        <p>Cualquier consulta, escríbenos por WhatsApp: <a href="https://wa.me/51913897717">+51 913 897 717</a></p>
-        <p>¡Gracias por confiar en Santa Patita! 🐾</p>`,
+      subject: isSubscription ? '🐾 ¡Tu suscripción a Santa Patita está activa!' : '🐾 ¡Gracias por tu compra en Santa Patita!',
+      html: emailShell({
+        eyebrow: isSubscription ? 'Suscripción activa' : 'Pago confirmado',
+        title: isSubscription ? '¡Tu suscripción está activa! 🎉' : '¡Gracias por tu compra! 🎉',
+        subtitle: 'Cada huellita es un propósito 🐾',
+        bodyHtml,
+        ctaHref: 'https://wa.me/51913897717',
+        ctaLabel: '💬 Escríbenos por WhatsApp',
+      }),
     }),
   });
   if (!res.ok) throw new Error(`Resend (cliente) respondió ${res.status}: ${await res.text()}`);
