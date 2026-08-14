@@ -191,7 +191,9 @@ function emailShell({ eyebrow, title, subtitle, bodyHtml, ctaHref, ctaLabel }) {
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:560px;margin:0 auto;background:#ffffff;border-radius:20px;overflow:hidden;border:1px solid #eef2f7;">
       <tr>
         <td style="background:#2596e4;background:linear-gradient(135deg,#2596e4,#3aaee8);padding:32px 24px;text-align:center;">
-          <img src="https://santapatita.pe/logo.png" width="52" height="52" alt="Santa Patita" style="border-radius:50%;background:#ffffff;padding:6px;display:inline-block;"/>
+          <div style="display:inline-block;background:#ffffff;border-radius:14px;padding:8px 16px;">
+            <img src="https://santapatita.pe/logo.png" width="150" height="72" alt="Santa Patita" style="display:block;max-width:150px;height:auto;"/>
+          </div>
           ${eyebrow ? `<div style="color:#ffffff;opacity:.85;font-size:12px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;margin-top:14px;">${eyebrow}</div>` : ''}
           <div style="color:#ffffff;font-size:22px;font-weight:800;margin-top:4px;">${title}</div>
           ${subtitle ? `<div style="color:#ffffff;opacity:.9;font-size:13px;margin-top:6px;">${subtitle}</div>` : ''}
