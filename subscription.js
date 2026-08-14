@@ -1,4 +1,4 @@
-// Flujo de suscripción: peso → plan recomendado → mensual/trimestral → datos del perro → pago.
+// Flujo de suscripción: peso → plan recomendado → mensual/trimestral → tus datos → datos del perro → pago.
 // Espejo en el cliente de la config y las reglas en lib/pricing.js — el servidor
 // (api/izipay/create-payment.js) siempre recalcula el monto real, esto es solo para mostrar.
 (function () {
@@ -10,7 +10,7 @@
   const PLANS = {
     PATITA: { label: 'Patita', weightLabel: 'Perro hasta 10 kg', monthly: { gummies: 30, price: 27 }, quarterly: { gummies: 90, price: 70 } },
     PATA:   { label: 'Pata',   weightLabel: 'Perro de 10 a 25 kg', monthly: { gummies: 60, price: 50 }, quarterly: { gummies: 180, price: 135 } },
-    PATAZA: { label: 'Pataza', weightLabel: '+25 kg o 2 perros',   monthly: { gummies: 90, price: 72 }, quarterly: { gummies: 270, price: 199 } },
+    PATAZA: { label: 'Pataza', weightLabel: '+25 kg',   monthly: { gummies: 90, price: 72 }, quarterly: { gummies: 270, price: 199 } },
   };
 
   const WEIGHT_TO_PLAN = { hasta10: 'PATITA', '10a25': 'PATA', mas25: 'PATAZA' };
@@ -22,17 +22,26 @@
   };
 
   const BENEFITS_BASE = [
-    'Precio congelado',
-    'Cambio de sabor libre',
-    'Pausa o cancela cuando quieras',
-    'Club Santa Patita',
-    'Regalo de cumpleaños de tu perro',
-    'Refiere y ganan los dos un mes gratis',
+    { label: 'Precio congelado', detail: 'Tu precio no sube aunque el plan aumente para nuevos suscriptores — pagas siempre lo mismo mientras sigas suscrito.' },
+    { label: 'Cambio de sabor libre', detail: 'Puedes cambiar el sabor de tu peludito en cualquier entrega, sin costo extra ni preguntas.' },
+    { label: 'Pausa o cancela cuando quieras', detail: 'Sin contratos ni penalidades — pausa uno o varios ciclos, o cancela cuando quieras.' },
+    { label: 'Club Santa Patita', detail: 'Acceso a promociones, sorteos y contenido exclusivo para suscriptores.' },
+    { label: 'Regalo de cumpleaños de tu perro', detail: 'El mes del cumpleaños de tu perro le mandamos un detalle especial junto a su pedido.' },
+    { label: 'Refiere y ganan los dos un mes gratis', detail: 'Comparte tu código con otro dueño de perro: cuando se suscriba, ambos reciben un mes gratis.' },
   ];
   const BENEFITS_EXTRA = {
     PATITA: [],
-    PATA: ['Dos sabores por entrega', 'Acceso anticipado a sabores nuevos', 'Bandana de bienvenida'],
-    PATAZA: ['Entrega prioritaria', 'Kit de bienvenida', '15% en catálogo futuro', 'Perro del Mes en redes'],
+    PATA: [
+      { label: 'Dos sabores por entrega', detail: 'En cada entrega mezclamos dos sabores a tu elección, no solo uno.' },
+      { label: 'Acceso anticipado a sabores nuevos', detail: 'Pruebas los sabores nuevos antes de que salgan al público.' },
+      { label: 'Bandana de bienvenida', detail: 'Te enviamos una bandana Santa Patita de regalo en tu primera entrega.' },
+    ],
+    PATAZA: [
+      { label: 'Entrega prioritaria', detail: 'Tu pedido se prepara y despacha primero, antes que las entregas regulares.' },
+      { label: 'Kit de bienvenida', detail: 'Recibes un kit de bienvenida con productos y sorpresas Santa Patita.' },
+      { label: '15% en catálogo futuro', detail: '15% de descuento permanente en los nuevos productos que lancemos.' },
+      { label: 'Perro del Mes en redes', detail: 'Tu perro puede ser elegido "Perro del Mes" y aparecer en nuestras redes sociales.' },
+    ],
   };
 
   const state = { weightRange: null, planCode: null, cadence: 'monthly', district: '' };
@@ -62,15 +71,31 @@
     document.getElementById('quarterlyGummies').textContent = `${plan.quarterly.gummies} gomitas cada 3 meses`;
 
     const benefits = BENEFITS_BASE.concat(BENEFITS_EXTRA[state.planCode] || []);
-    document.getElementById('planBenefits').innerHTML = benefits.map((b) => `<li>${b}</li>`).join('');
+    document.getElementById('planBenefits').innerHTML = benefits.map((b) => `
+      <li class="benefit-item">
+        <div class="benefit-item__row">${b.label}<span class="benefit-item__info">ⓘ</span></div>
+        <p class="benefit-item__detail">${b.detail}</p>
+      </li>
+    `).join('');
 
     document.getElementById('planResult').style.display = 'block';
     document.getElementById('subForm').style.display = 'block';
+    document.getElementById('dogForm').style.display = 'block';
 
     document.querySelectorAll('.cadence-card').forEach((card) => {
       card.classList.toggle('selected', card.dataset.cadence === state.cadence);
     });
   }
+
+  // Tap/click en un beneficio lo deja "abierto" (para celular, que no tiene hover).
+  // Delegado en el contenedor porque la lista se re-renderiza en cada cambio de plan.
+  document.getElementById('planBenefits').addEventListener('click', (e) => {
+    const item = e.target.closest('.benefit-item');
+    if (!item) return;
+    const wasOpen = item.classList.contains('open');
+    document.querySelectorAll('.benefit-item.open').forEach((el) => el.classList.remove('open'));
+    if (!wasOpen) item.classList.add('open');
+  });
 
   function updateSummary() {
     const plan = PLANS[state.planCode];
@@ -135,7 +160,7 @@
     updateSummary();
   });
 
-  // ── Recordar datos del cliente (mismo storage que el checkout de la tienda) ──
+  // ── Recordar datos del dueño (mismo storage que el checkout de la tienda) ──
   function saveCustomerData(data) {
     try { localStorage.setItem(CUSTOMER_STORAGE_KEY, JSON.stringify(data)); } catch (e) {}
   }
@@ -145,9 +170,17 @@
     try { saved = JSON.parse(localStorage.getItem(CUSTOMER_STORAGE_KEY) || 'null'); } catch (e) { saved = null; }
     if (!saved) return;
 
-    const addressEl = document.getElementById('deliveryAddress');
+    const fields = {
+      subFirstName: saved.firstName, subLastName: saved.lastName,
+      subEmail: saved.email, subPhone: saved.phone,
+      deliveryAddress: saved.address,
+    };
+    Object.keys(fields).forEach((id) => {
+      const el = document.getElementById(id);
+      if (el && !el.value && fields[id]) el.value = fields[id];
+    });
+
     const districtEl = document.getElementById('districtSelect');
-    if (addressEl && !addressEl.value && saved.address) addressEl.value = saved.address;
     if (districtEl && !districtEl.value && saved.district && DISTRICT_FEES[saved.district] !== undefined) {
       districtEl.value = saved.district;
       state.district = saved.district;
@@ -166,17 +199,9 @@
         <button type="button" class="modal-close" id="izipayModalClose" aria-label="Cerrar">✕</button>
         <h3 class="modal-title">💳 Pagar el primer ciclo</h3>
 
-        <div id="izipayStepForm">
-          <div class="izipay-field"><label>Nombre</label><input type="text" id="izipayFirstName" placeholder="María"/></div>
-          <div class="izipay-field"><label>Apellido</label><input type="text" id="izipayLastName" placeholder="Gómez"/></div>
-          <div class="izipay-field"><label>Email</label><input type="email" id="izipayEmail" placeholder="maria@correo.com"/></div>
-          <div class="izipay-field"><label>Teléfono</label><input type="tel" id="izipayPhone" placeholder="987654321"/></div>
-          <div class="izipay-field"><label>DNI <span class="izipay-field__hint">(opcional, mejora la aprobación del pago)</span></label><input type="text" id="izipayDni" placeholder="12345678" maxlength="8"/></div>
-          <p class="izipay-error" id="izipayError" style="display:none;"></p>
-          <button type="button" class="btn btn--sky btn--full" id="izipayContinueBtn">Continuar al pago 🔒</button>
-        </div>
+        <p class="izipay-error" id="izipayError" style="display:none;"></p>
 
-        <div id="izipayStepPayment" style="display:none;">
+        <div id="izipayStepPayment">
           <div class="kr-embedded" id="izipayFormZone"></div>
         </div>
 
@@ -191,7 +216,6 @@
 
     document.getElementById('izipayModalClose').addEventListener('click', closeSubscriptionModal);
     overlay.addEventListener('click', (e) => { if (e.target === overlay) closeSubscriptionModal(); });
-    document.getElementById('izipayContinueBtn').addEventListener('click', startPayment);
   }
 
   function showError(msg) {
@@ -201,30 +225,51 @@
   }
 
   function resetModalSteps() {
-    document.getElementById('izipayStepForm').style.display = 'block';
-    document.getElementById('izipayStepPayment').style.display = 'none';
+    document.getElementById('izipayStepPayment').style.display = 'block';
+    document.getElementById('izipayStepPayment').innerHTML = '<p style="text-align:center;color:var(--muted);">Preparando tu pago…</p>';
     document.getElementById('izipayStepSuccess').style.display = 'none';
     document.getElementById('izipayError').style.display = 'none';
+  }
+
+  function readOwnerFields() {
+    return {
+      firstName: document.getElementById('subFirstName').value.trim(),
+      lastName: document.getElementById('subLastName').value.trim(),
+      email: document.getElementById('subEmail').value.trim(),
+      phone: document.getElementById('subPhone').value.trim(),
+      dni: document.getElementById('subDni').value.trim(),
+    };
+  }
+
+  function readDogFields() {
+    return {
+      name: document.getElementById('dogName').value.trim(),
+      weight: document.getElementById('dogWeight').value.trim(),
+      birthday: document.getElementById('dogBirthday').value,
+    };
   }
 
   window.openSubscriptionCheckout = function () {
     if (!state.planCode) { alert('🐾 ¡Cuéntanos cuánto pesa tu perro primero!'); return; }
 
-    const dogName = document.getElementById('dogName').value.trim();
-    const dogWeight = document.getElementById('dogWeight').value.trim();
-    const dogBirthday = document.getElementById('dogBirthday').value;
+    const owner = readOwnerFields();
+    const dog = readDogFields();
     const district = document.getElementById('districtSelect').value;
     const address = document.getElementById('deliveryAddress').value.trim();
 
-    if (!dogName) { alert('🐾 ¡Escribe el nombre de tu perro!'); return; }
-    if (!dogWeight) { alert('🐾 ¡Escribe el peso exacto de tu perro!'); return; }
-    if (!dogBirthday) { alert('🐾 ¡Elige el cumpleaños de tu perro!'); return; }
+    if (!owner.firstName || !owner.lastName) { alert('🐾 ¡Escribe tu nombre y apellido!'); return; }
+    if (!owner.email) { alert('🐾 ¡Escribe tu correo!'); return; }
+    if (!owner.phone) { alert('🐾 ¡Escribe tu WhatsApp!'); return; }
     if (!district) { alert('🐾 ¡Elige tu distrito de entrega!'); return; }
     if (!address) { alert('🐾 ¡Escribe tu dirección exacta!'); return; }
+    if (!dog.name) { alert('🐾 ¡Escribe el nombre de tu perro!'); return; }
+    if (!dog.weight) { alert('🐾 ¡Escribe el peso exacto de tu perro!'); return; }
+    if (!dog.birthday) { alert('🐾 ¡Elige el cumpleaños de tu perro!'); return; }
 
     ensureModal();
     resetModalSteps();
     document.getElementById('izipayModal').classList.add('open');
+    startPayment();
   };
 
   window.closeSubscriptionModal = function () {
@@ -252,40 +297,22 @@
   }
 
   async function startPayment() {
-    const firstName = document.getElementById('izipayFirstName').value.trim();
-    const lastName = document.getElementById('izipayLastName').value.trim();
-    const email = document.getElementById('izipayEmail').value.trim();
-    const phone = document.getElementById('izipayPhone').value.trim();
-    const dni = document.getElementById('izipayDni').value.trim();
-
-    document.getElementById('izipayError').style.display = 'none';
-
-    if (!firstName || !lastName || !email || !phone) {
-      showError('🐾 Completa nombre, apellido, email y teléfono para continuar.');
-      return;
-    }
-
-    const dogName = document.getElementById('dogName').value.trim();
-    const dogWeight = document.getElementById('dogWeight').value.trim();
-    const dogBirthday = document.getElementById('dogBirthday').value;
+    const owner = readOwnerFields();
+    const dog = readDogFields();
     const district = document.getElementById('districtSelect').value;
     const address = document.getElementById('deliveryAddress').value.trim();
     const lat = document.getElementById('deliveryLat').value;
     const lng = document.getElementById('deliveryLng').value;
 
-    saveCustomerData({ firstName, lastName, email, phone, address, district });
-
-    const btn = document.getElementById('izipayContinueBtn');
-    btn.disabled = true;
-    btn.textContent = 'Procesando...';
+    saveCustomerData({ firstName: owner.firstName, lastName: owner.lastName, email: owner.email, phone: owner.phone, address, district });
 
     const payload = {
       orderType: 'subscription',
-      customer: { firstName, lastName, email, phone, identityCode: dni || undefined },
+      customer: { firstName: owner.firstName, lastName: owner.lastName, email: owner.email, phone: owner.phone, identityCode: owner.dni || undefined },
       subscription: {
         planCode: state.planCode,
         cadence: state.cadence,
-        dog: { name: dogName, weight: dogWeight, birthday: dogBirthday },
+        dog: { name: dog.name, weight: dog.weight, birthday: dog.birthday },
         district,
         address,
         lat: lat || null,
@@ -303,9 +330,8 @@
       data = await res.json();
       if (!res.ok) throw new Error(data.error || 'No se pudo iniciar el pago.');
     } catch (err) {
+      document.getElementById('izipayStepPayment').innerHTML = '';
       showError('⚠️ ' + err.message);
-      btn.disabled = false;
-      btn.textContent = 'Continuar al pago 🔒';
       return;
     }
 
@@ -314,9 +340,7 @@
 
     try {
       const KR = await loadKrypton(data.publicKey);
-
-      document.getElementById('izipayStepForm').style.display = 'none';
-      document.getElementById('izipayStepPayment').style.display = 'block';
+      document.getElementById('izipayStepPayment').innerHTML = '<div class="kr-embedded" id="izipayFormZone"></div>';
 
       await KR.setFormToken(data.formToken);
 
@@ -326,12 +350,7 @@
         submitHandlersAttached = true;
       }
     } catch (err) {
-      document.getElementById('izipayStepPayment').style.display = 'none';
-      document.getElementById('izipayStepForm').style.display = 'block';
       showError('⚠️ ' + ((err && err.message) || 'No se pudo mostrar el formulario de pago.'));
-    } finally {
-      btn.disabled = false;
-      btn.textContent = 'Continuar al pago 🔒';
     }
   }
 
@@ -343,8 +362,7 @@
 
       const plan = PLANS[state.planCode];
       const cadenceLabel = state.cadence === 'quarterly' ? 'Trimestral' : 'Mensual';
-      const dogName = document.getElementById('dogName').value.trim();
-      const dogBirthday = document.getElementById('dogBirthday').value;
+      const dog = readDogFields();
       const district = document.getElementById('districtSelect').value;
       const address = document.getElementById('deliveryAddress').value.trim();
 
@@ -352,7 +370,7 @@
       msg += `🧾 *N° de orden:* ${lastOrderId}\n`;
       msg += `💰 *Total pagado:* S/ ${lastAmount}\n\n`;
       msg += `📦 *Plan:* ${plan ? plan.label : state.planCode} ${cadenceLabel}\n`;
-      msg += `🐶 *Perro:* ${dogName} — cumple ${dogBirthday}\n`;
+      msg += `🐶 *Perro:* ${dog.name} — cumple ${dog.birthday}\n`;
       msg += `📍 *Distrito:* ${district}\n`;
       msg += `🏠 *Dirección:* ${address}\n`;
       const lat = document.getElementById('deliveryLat').value, lng = document.getElementById('deliveryLng').value;
@@ -361,16 +379,13 @@
 
       document.getElementById('izipayWhatsappBtn').href = 'https://wa.me/' + WHATSAPP_NUMBER + '?text=' + encodeURIComponent(msg);
     } else {
-      document.getElementById('izipayStepPayment').style.display = 'none';
-      document.getElementById('izipayStepForm').style.display = 'block';
+      document.getElementById('izipayStepPayment').innerHTML = '';
       showError('⚠️ El pago no se completó (estado: ' + status + '). Intenta con otra tarjeta.');
     }
     return false;
   }
 
   function onPaymentError(error) {
-    document.getElementById('izipayStepPayment').style.display = 'none';
-    document.getElementById('izipayStepForm').style.display = 'block';
     showError('⚠️ ' + (error && error.errorMessage ? error.errorMessage : 'Ocurrió un error con el pago.'));
   }
 })();

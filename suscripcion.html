@@ -47,11 +47,26 @@
 
     .plan-dose { font-size:.85rem; font-weight:800; color:var(--sky-d); margin-bottom:20px; }
 
-    .plan-benefits { list-style:none; padding:0; margin:0 0 8px; }
-    .plan-benefits li { display:flex; gap:10px; align-items:flex-start; font-size:.88rem; color:var(--dark2); padding:6px 0; }
-    .plan-benefits li::before { content:'🐾'; flex-shrink:0; }
+    .plan-benefits__heading {
+      font-family:'Fredoka One',cursive; font-size:1.02rem; color:var(--dark);
+      display:inline-flex; align-items:center; gap:8px; margin:22px 0 6px;
+      background:linear-gradient(135deg, var(--yellow), var(--yellow-d));
+      padding:7px 20px; border-radius:50px; box-shadow:0 4px 14px rgba(247,198,24,.4);
+    }
+    .plan-benefits__heading .emoji-bounce { display:inline-block; animation:benefitBounce 1.6s ease-in-out infinite; }
+    @keyframes benefitBounce { 0%,100%{ transform:translateY(0) rotate(0); } 50%{ transform:translateY(-4px) rotate(-8deg); } }
+    .plan-benefits__hint { font-size:.78rem; color:var(--muted); font-weight:700; margin-bottom:8px; }
 
-    /* Paso 3: datos */
+    .plan-benefits { list-style:none; padding:0; margin:0 0 8px; }
+    .benefit-item { border-radius:12px; cursor:pointer; }
+    .benefit-item__row { display:flex; gap:10px; align-items:center; font-size:.88rem; color:var(--dark2); padding:9px 10px; border-radius:12px; transition:var(--t); }
+    .benefit-item__row::before { content:'🐾'; flex-shrink:0; }
+    .benefit-item__info { margin-left:auto; color:var(--sky-d); font-size:.85rem; opacity:.65; flex-shrink:0; }
+    .benefit-item:hover .benefit-item__row, .benefit-item.open .benefit-item__row { background:var(--sky-l); }
+    .benefit-item__detail { display:none; font-size:.8rem; color:var(--muted); line-height:1.55; padding:0 10px 10px 34px; }
+    .benefit-item:hover .benefit-item__detail, .benefit-item.open .benefit-item__detail { display:block; }
+
+    /* Datos del dueño / del perro */
     .sub-form { display:none; max-width:640px; margin:40px auto 0; }
     .sub-form .izipay-field { margin-bottom:16px; }
     .sub-form .izipay-field label { display:block; font-size:.85rem; font-weight:800; color:var(--dark); margin-bottom:6px; }
@@ -60,6 +75,9 @@
       font-family:'Nunito',sans-serif; font-size:.95rem; color:var(--dark); background:white; outline:none; transition:var(--t);
     }
     .sub-form .izipay-field input:focus, .sub-form .izipay-field select:focus { border-color:var(--sky); }
+    .sub-form__grid { display:grid; grid-template-columns:1fr 1fr; gap:0 16px; }
+    .sub-form__grid .izipay-field:nth-child(5) { grid-column:1 / -1; }
+    @media (max-width:600px) { .sub-form__grid { grid-template-columns:1fr; } }
 
     .sub-summary { display:none; max-width:640px; margin:32px auto 0; }
     .sub-summary__row { display:flex; justify-content:space-between; font-size:.92rem; color:var(--dark2); padding:6px 0; }
@@ -136,8 +154,8 @@
         <label class="weight-card" data-weight="mas25">
           <input type="radio" name="weightRange" value="mas25"/>
           <div class="weight-card__inner">
-            <span class="weight-card__icon">🐶🐶</span>
-            <div class="weight-card__label">+25 kg o 2 perros</div>
+            <span class="weight-card__icon">🦮</span>
+            <div class="weight-card__label">+25 kg</div>
           </div>
         </label>
       </div>
@@ -171,16 +189,23 @@
 
         <p class="plan-dose">🥣 Dosis: desde 1 gomita al día</p>
 
+        <h4 class="plan-benefits__heading"><span class="emoji-bounce">🎁</span> Beneficios</h4>
+        <p class="plan-benefits__hint">Toca cada beneficio para ver de qué se trata 👇</p>
         <ul class="plan-benefits" id="planBenefits"></ul>
       </div>
     </div>
 
-    <!-- PASO 3: DATOS -->
+    <!-- PASO 2: DATOS DEL DUEÑO (para entrega y boleta/factura) -->
     <div class="order-step sub-form" id="subForm">
-      <div class="step-label"><span class="step-num">2</span> Los datos de tu peludito</div>
-      <div class="izipay-field"><label>Nombre del perro</label><input type="text" id="dogName" placeholder="Rocky"/></div>
-      <div class="izipay-field"><label>Peso exacto (kg)</label><input type="number" id="dogWeight" min="0.5" max="90" step="0.1" placeholder="8.5"/></div>
-      <div class="izipay-field"><label>Cumpleaños de tu perro</label><input type="date" id="dogBirthday"/></div>
+      <div class="step-label"><span class="step-num">2</span> Tus datos</div>
+      <p class="date-hint" style="margin-bottom:16px;">Los usamos para tu entrega y tu boleta o factura.</p>
+      <div class="sub-form__grid">
+        <div class="izipay-field"><label>Nombre</label><input type="text" id="subFirstName" placeholder="María"/></div>
+        <div class="izipay-field"><label>Apellido</label><input type="text" id="subLastName" placeholder="Gómez"/></div>
+        <div class="izipay-field"><label>Correo</label><input type="email" id="subEmail" placeholder="maria@correo.com"/></div>
+        <div class="izipay-field"><label>WhatsApp</label><input type="tel" id="subPhone" placeholder="987654321"/></div>
+        <div class="izipay-field"><label>DNI <span class="izipay-field__hint">(para tu boleta o factura)</span></label><input type="text" id="subDni" placeholder="12345678" maxlength="8"/></div>
+      </div>
 
       <div class="izipay-field">
         <label>Distrito de entrega</label>
@@ -215,6 +240,14 @@
       <p class="date-hint" id="deliveryMapHint">📍 Selecciona tu dirección de la lista o ajusta el pin en el mapa para confirmar tu ubicación exacta.</p>
       <input type="hidden" id="deliveryLat"/>
       <input type="hidden" id="deliveryLng"/>
+    </div>
+
+    <!-- PASO 3: DATOS DEL PERRO -->
+    <div class="order-step sub-form" id="dogForm">
+      <div class="step-label"><span class="step-num">3</span> Los datos de tu peludito</div>
+      <div class="izipay-field"><label>Nombre del perro</label><input type="text" id="dogName" placeholder="Rocky"/></div>
+      <div class="izipay-field"><label>Peso exacto (kg)</label><input type="number" id="dogWeight" min="0.5" max="90" step="0.1" placeholder="8.5"/></div>
+      <div class="izipay-field"><label>Cumpleaños de tu perro</label><input type="date" id="dogBirthday"/></div>
     </div>
 
     <!-- RESUMEN -->

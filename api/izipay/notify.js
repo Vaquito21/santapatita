@@ -86,7 +86,7 @@ module.exports = async (req, res) => {
       lng: orderInfo.lng,
     };
 
-    const results = await Promise.allSettled([notifyEmail(details), notifyWhatsapp(details)]);
+    const results = await Promise.allSettled([notifyEmail(details), notifyWhatsapp(details), notifyCustomerEmail(details)]);
     results.forEach((r) => { if (r.status === 'rejected') console.error('Notificación de pago falló:', r.reason); });
   }
 
@@ -213,6 +213,51 @@ async function notifyEmail(d) {
     }),
   });
   if (!res.ok) throw new Error(`Resend respondió ${res.status}: ${await res.text()}`);
+}
+
+// Correo de confirmación AL CLIENTE (distinto del aviso interno de arriba).
+// Nota: 'onboarding@resend.dev' es el dominio de pruebas de Resend — solo entrega
+// de forma confiable al correo dueño de la cuenta. Para que le llegue a clientes
+// reales hay que verificar un dominio propio (ej. mail.santapatita.pe) en Resend.
+async function notifyCustomerEmail(d) {
+  const apiKey = process.env.RESEND_API_KEY;
+  if (!apiKey || !d.email) return;
+
+  const b = amountBreakdown(d);
+  const isSubscription = d.type === 'subscription';
+  const firstName = d.name ? d.name.split(' ')[0] : null;
+  const greeting = firstName ? `¡Hola ${firstName}! 🐾` : '¡Hola! 🐾';
+
+  const amountLines = b.hasBreakdown
+    ? `<p>Producto: <strong>${b.productText}</strong><br/>Envío: <strong>${b.shippingText}</strong><br/>Total: <strong>${b.totalText}</strong></p>`
+    : `<p>Total pagado: <strong>${b.totalText}</strong></p>`;
+  const pedidoBlock = isSubscription
+    ? `<p>${orderSummary(d)}</p>`
+    : orderSummary(d, 'html');
+  const entregaLine = `<p>Entrega: ${d.deliveryType === 'delivery' ? 'Delivery' : 'Recojo en tienda'}${d.district ? ' — ' + d.district : ''}${d.address ? ' — ' + d.address : ''}</p>`;
+  const subject = isSubscription ? '🐾 ¡Tu suscripción a Santa Patita está activa!' : '🐾 ¡Gracias por tu compra en Santa Patita!';
+  const intro = isSubscription
+    ? 'Tu suscripción quedó activa. Este es el resumen de tu primer ciclo:'
+    : '¡Recibimos tu pago! Este es el resumen de tu pedido:';
+
+  const res = await fetch('https://api.resend.com/emails', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${apiKey}` },
+    body: JSON.stringify({
+      from: 'Santa Patita <onboarding@resend.dev>',
+      to: [d.email],
+      subject,
+      html: `<p>${greeting}</p>
+        <p>${intro}</p>
+        <p>N° de orden: <strong>${d.orderId}</strong></p>
+        ${pedidoBlock}
+        ${amountLines}
+        ${entregaLine}
+        <p>Cualquier consulta, escríbenos por WhatsApp: <a href="https://wa.me/51913897717">+51 913 897 717</a></p>
+        <p>¡Gracias por confiar en Santa Patita! 🐾</p>`,
+    }),
+  });
+  if (!res.ok) throw new Error(`Resend (cliente) respondió ${res.status}: ${await res.text()}`);
 }
 
 // Cada número de WhatsApp tiene su propia API key en CallMeBot (se registra por
