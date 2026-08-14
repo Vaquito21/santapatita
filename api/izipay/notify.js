@@ -378,5 +378,12 @@ async function notifyWhatsapp(d) {
 async function sendCallMeBot(phone, apiKey, text) {
   const url = `https://api.callmebot.com/whatsapp.php?phone=${encodeURIComponent(phone)}&text=${encodeURIComponent(text)}&apikey=${encodeURIComponent(apiKey)}`;
   const res = await fetch(url);
-  if (!res.ok) throw new Error(`CallMeBot respondió ${res.status}: ${await res.text()}`);
+  const body = await res.text();
+  if (!res.ok) throw new Error(`CallMeBot respondió ${res.status}: ${body}`);
+  // CallMeBot casi siempre responde HTTP 200 incluso cuando el mensaje NO se
+  // envió de verdad (límite diario alcanzado, sesión vencida, apikey inválida)
+  // — el status por sí solo no basta, hay que revisar el texto del cuerpo.
+  if (!/message (queued|sent)/i.test(body)) {
+    throw new Error(`CallMeBot respondió 200 pero sin confirmar el envío: ${body.slice(0, 300)}`);
+  }
 }

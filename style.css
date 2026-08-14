@@ -267,6 +267,13 @@ a { text-decoration: none; color: inherit; }
   font-family: 'Nunito', sans-serif; font-size: .95rem; color: var(--text); transition: var(--t);
 }
 .izipay-field input:focus { outline: none; border-color: var(--sky); }
+.izipay-field select {
+  width: 100%; padding: 12px 14px; border: 2px solid var(--sky-l); border-radius: 12px;
+  font-family: 'Nunito', sans-serif; font-size: .95rem; color: var(--text); background: #fff; transition: var(--t);
+}
+.izipay-field select:focus { outline: none; border-color: var(--sky); }
+.dob-select-row { display: flex; gap: 8px; }
+.dob-select-row select { flex: 1; min-width: 0; }
 .izipay-error { color: #d64545; font-size: .85rem; font-weight: 700; margin-bottom: 14px; text-align: center; }
 .izipay-success-text { color: var(--text); font-size: .95rem; line-height: 1.6; margin-bottom: 24px; }
 #izipayContinueBtn:disabled { opacity: .6; cursor: not-allowed; }

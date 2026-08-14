@@ -188,6 +188,57 @@
   }
   restoreCustomerData();
 
+  // ── Cumpleaños del perro: selects propios día/mes/año (el <input type="date">
+  // nativo muestra mm/dd/yyyy o dd/mm/yyyy según el idioma/región del SO del
+  // dispositivo, no el idioma de la página — no se puede forzar por CSS). El
+  // input oculto #dogBirthday sigue guardando ISO yyyy-mm-dd, igual que antes,
+  // para no tocar el resto del flujo (validación, envío a Izipay, notificaciones).
+  function initDogBirthdaySelect() {
+    const daySel = document.getElementById('dogBirthdayDay');
+    const monthSel = document.getElementById('dogBirthdayMonth');
+    const yearSel = document.getElementById('dogBirthdayYear');
+    const hidden = document.getElementById('dogBirthday');
+    if (!daySel || !monthSel || !yearSel || !hidden) return;
+
+    const MONTHS = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+    monthSel.innerHTML = '<option value="">Mes</option>' + MONTHS.map((m, i) => `<option value="${i + 1}">${m}</option>`).join('');
+
+    const currentYear = new Date().getFullYear();
+    let years = '<option value="">Año</option>';
+    for (let y = currentYear; y >= currentYear - 25; y--) years += `<option value="${y}">${y}</option>`;
+    yearSel.innerHTML = years;
+
+    function daysInMonth(month, year) {
+      if (!month) return 31;
+      return new Date(year || currentYear, month, 0).getDate();
+    }
+
+    function populateDays() {
+      const prevValue = daySel.value;
+      const month = parseInt(monthSel.value, 10) || null;
+      const year = parseInt(yearSel.value, 10) || null;
+      const total = daysInMonth(month, year);
+      let opts = '<option value="">Día</option>';
+      for (let d = 1; d <= total; d++) opts += `<option value="${d}">${d}</option>`;
+      daySel.innerHTML = opts;
+      if (prevValue && parseInt(prevValue, 10) <= total) daySel.value = prevValue;
+    }
+
+    function syncHidden() {
+      const d = daySel.value, m = monthSel.value, y = yearSel.value;
+      hidden.value = (d && m && y) ? `${y}-${String(m).padStart(2, '0')}-${String(d).padStart(2, '0')}` : '';
+    }
+
+    populateDays();
+    [daySel, monthSel, yearSel].forEach((sel) => {
+      sel.addEventListener('change', () => {
+        if (sel !== daySel) populateDays();
+        syncHidden();
+      });
+    });
+  }
+  initDogBirthdaySelect();
+
   function ensureModal() {
     if (document.getElementById('izipayModal')) return;
 
