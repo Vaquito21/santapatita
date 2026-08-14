@@ -313,7 +313,7 @@
     if (!owner.firstName || !owner.lastName) { alert('🐾 ¡Escribe tu nombre y apellido!'); return; }
     if (!owner.email) { alert('🐾 ¡Escribe tu correo!'); return; }
     if (!owner.phone) { alert('🐾 ¡Escribe tu WhatsApp!'); return; }
-    if (!owner.dni) { alert('🐾 ¡Escribe tu DNI! Lo necesitamos para tu boleta y ayuda a que el pago se apruebe.'); return; }
+    if (!owner.dni) { alert('🐾 ¡Escribe tu DNI! Lo necesitamos para tu boleta o factura.'); return; }
     if (!district) { alert('🐾 ¡Elige tu distrito de entrega!'); return; }
     if (!address) { alert('🐾 ¡Escribe tu dirección exacta!'); return; }
     if (!dog.name) { alert('🐾 ¡Escribe el nombre de tu perro!'); return; }
