@@ -268,6 +268,13 @@
     if (!dog.weight) { alert('🐾 ¡Escribe el peso exacto de tu perro!'); return; }
     if (!dog.birthday) { alert('🐾 ¡Elige el cumpleaños de tu perro!'); return; }
 
+    if (typeof trackInitiateCheckout === 'function') {
+      const plan = PLANS[state.planCode];
+      const tier = plan ? plan[state.cadence] : null;
+      const fee = computeShippingFee(state.planCode, state.cadence, district) || 0;
+      trackInitiateCheckout((tier ? tier.price : 0) + fee, 1, [state.planCode + '-' + state.cadence]);
+    }
+
     ensureModal();
     resetModalSteps();
     document.getElementById('izipayModal').classList.add('open');
@@ -367,6 +374,10 @@
       const dog = readDogFields();
       const district = document.getElementById('districtSelect').value;
       const address = document.getElementById('deliveryAddress').value.trim();
+
+      if (typeof trackPurchase === 'function') {
+        trackPurchase(lastOrderId, lastAmount, [state.planCode + '-' + state.cadence], 1);
+      }
 
       let msg = `¡Hola Santa Patita! 🐾 Ya pagué mi suscripción con tarjeta ✅\n\n`;
       msg += `🧾 *N° de orden:* ${lastOrderId}\n`;

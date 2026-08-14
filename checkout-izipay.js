@@ -128,6 +128,13 @@
       if (!address)  { alert('🐾 ¡Escribe tu dirección exacta!'); return; }
     }
 
+    if (typeof trackInitiateCheckout === 'function') {
+      const value = cart.reduce((sum, i) => sum + i.price * i.qty, 0);
+      const numItems = cart.reduce((sum, i) => sum + i.qty, 0);
+      const ids = cart.map((i) => fbSlug(i.flavor) + '-' + i.units + 'u');
+      trackInitiateCheckout(value, numItems, ids);
+    }
+
     ensureModal();
     resetModalSteps();
     document.getElementById('izipayModal').classList.add('open');
@@ -238,6 +245,13 @@
       msg += `\n¿Pueden confirmarme la entrega? ¡Gracias!`;
 
       document.getElementById('izipayWhatsappBtn').href = 'https://wa.me/' + WHATSAPP_NUMBER + '?text=' + encodeURIComponent(msg);
+
+      if (typeof trackPurchase === 'function') {
+        const numItems = cart.reduce((sum, i) => sum + i.qty, 0);
+        const ids = cart.map((i) => fbSlug(i.flavor) + '-' + i.units + 'u');
+        trackPurchase(lastOrderId, lastAmount, ids, numItems);
+      }
+
       cart.length = 0;
       try { localStorage.removeItem('santapatita_cart'); } catch (e) {}
       if (typeof renderCart === 'function') renderCart();
