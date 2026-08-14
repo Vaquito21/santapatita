@@ -179,10 +179,15 @@ async function notifyEmail(d) {
   if (!res.ok) throw new Error(`Resend respondió ${res.status}: ${await res.text()}`);
 }
 
+// Cada número de WhatsApp tiene su propia API key en CallMeBot (se registra por
+// separado), así que un segundo destinatario (ej. número personal) es opcional
+// vía CALLMEBOT_PHONE_2 / CALLMEBOT_APIKEY_2.
 async function notifyWhatsapp(d) {
-  const phone = process.env.CALLMEBOT_PHONE;
-  const apiKey = process.env.CALLMEBOT_APIKEY;
-  if (!phone || !apiKey) return;
+  const recipients = [
+    { phone: process.env.CALLMEBOT_PHONE, apiKey: process.env.CALLMEBOT_APIKEY },
+    { phone: process.env.CALLMEBOT_PHONE_2, apiKey: process.env.CALLMEBOT_APIKEY_2 },
+  ].filter((r) => r.phone && r.apiKey);
+  if (recipients.length === 0) return;
 
   const amountText = d.amount != null ? `S/ ${d.amount}` : 'monto no disponible';
   const titleLine = d.type === 'subscription' ? '🐾 Nueva suscripción pagada' : '🐾 Nuevo pago recibido';
@@ -195,6 +200,16 @@ async function notifyWhatsapp(d) {
   text += `Dirección: ${d.address || 'No disponible (revisar con el cliente)'}\n`;
   if (d.lat && d.lng) text += `Ubicación (mapa): https://www.google.com/maps?q=${d.lat},${d.lng}\n`;
 
+  const results = await Promise.allSettled(recipients.map((r) => sendCallMeBot(r.phone, r.apiKey, text)));
+  results.forEach((r, i) => {
+    if (r.status === 'rejected') console.error(`CallMeBot falló para ${recipients[i].phone}:`, r.reason);
+  });
+  if (results.every((r) => r.status === 'rejected')) {
+    throw new Error(results.map((r) => r.reason && r.reason.message).join('; '));
+  }
+}
+
+async function sendCallMeBot(phone, apiKey, text) {
   const url = `https://api.callmebot.com/whatsapp.php?phone=${encodeURIComponent(phone)}&text=${encodeURIComponent(text)}&apikey=${encodeURIComponent(apiKey)}`;
   const res = await fetch(url);
   if (!res.ok) throw new Error(`CallMeBot respondió ${res.status}: ${await res.text()}`);
