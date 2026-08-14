@@ -1,5 +1,10 @@
 const crypto = require('crypto');
 
+// Dominio propio verificado en Resend (mail.santapatita.pe) — reemplaza el
+// dominio de pruebas onboarding@resend.dev, que solo entregaba de forma
+// confiable al correo dueño de la cuenta.
+const SENDER_EMAIL = 'Santa Patita <pedidos@mail.santapatita.pe>';
+
 function computeHash(answer, key) {
   return crypto.createHmac('sha256', key).update(answer, 'utf8').digest('hex');
 }
@@ -197,7 +202,7 @@ async function notifyEmail(d) {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${apiKey}` },
     body: JSON.stringify({
-      from: 'Santa Patita <onboarding@resend.dev>',
+      from: SENDER_EMAIL,
       to: [to],
       subject: `${subjectPrefix} — ${d.orderId}`,
       html: `<p><strong>¡Nuevo pago confirmado!</strong></p>
@@ -216,9 +221,6 @@ async function notifyEmail(d) {
 }
 
 // Correo de confirmación AL CLIENTE (distinto del aviso interno de arriba).
-// Nota: 'onboarding@resend.dev' es el dominio de pruebas de Resend — solo entrega
-// de forma confiable al correo dueño de la cuenta. Para que le llegue a clientes
-// reales hay que verificar un dominio propio (ej. mail.santapatita.pe) en Resend.
 async function notifyCustomerEmail(d) {
   const apiKey = process.env.RESEND_API_KEY;
   if (!apiKey || !d.email) return;
@@ -244,7 +246,7 @@ async function notifyCustomerEmail(d) {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${apiKey}` },
     body: JSON.stringify({
-      from: 'Santa Patita <onboarding@resend.dev>',
+      from: SENDER_EMAIL,
       to: [d.email],
       subject,
       html: `<p>${greeting}</p>
