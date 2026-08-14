@@ -61,14 +61,19 @@ module.exports = async (req, res) => {
     const billing = customer && customer.billingDetails;
     const orderInfo = extractOrderInfo(transaction);
 
+    const billingName = billing ? [billing.firstName, billing.lastName].filter(Boolean).join(' ') : null;
+    const fallbackCustomer = orderInfo.customer || {};
+    const fallbackName = [fallbackCustomer.firstName, fallbackCustomer.lastName].filter(Boolean).join(' ');
+
     const details = {
       orderId,
       amount,
-      email: customer && customer.email,
-      name: billing ? [billing.firstName, billing.lastName].filter(Boolean).join(' ') : null,
-      phone: billing && billing.phoneNumber,
-      // billingDetails viene de vuelta desde Izipay, pero por si acaso lo omite,
-      // usamos como respaldo lo que nosotros mismos mandamos en orderInfo2.
+      // billingDetails viene de vuelta desde Izipay, pero en la práctica no
+      // siempre lo incluye en la notificación — usamos como respaldo lo que
+      // nosotros mismos mandamos en orderInfo3/orderInfo2.
+      email: (customer && customer.email) || fallbackCustomer.email,
+      name: billingName || (fallbackName || null),
+      phone: (billing && billing.phoneNumber) || fallbackCustomer.phone,
       address: (billing && billing.address) || orderInfo.address,
       district: (billing && billing.city) || orderInfo.district,
       type: orderInfo.type,
@@ -89,11 +94,12 @@ module.exports = async (req, res) => {
 // El carrito (o los datos de suscripción)/distrito/coordenadas viajan en orderInfo/orderInfo2
 // (o metadata como respaldo), ya que Izipay solo conoce el monto — nunca lo que se compró.
 function extractOrderInfo(transaction) {
-  const result = { type: 'cart', cart: [], subscription: null, deliveryType: null, district: null, address: null, lat: null, lng: null };
+  const result = { type: 'cart', cart: [], subscription: null, deliveryType: null, district: null, address: null, customer: null, lat: null, lng: null };
   if (!transaction) return result;
 
   const rawOrderInfo = transaction.orderInfo || (transaction.metadata && transaction.metadata.cart);
   const rawDelivery = transaction.orderInfo2 || (transaction.metadata && transaction.metadata.delivery);
+  const rawCustomer = transaction.orderInfo3 || (transaction.metadata && transaction.metadata.customer);
 
   try {
     if (rawOrderInfo) {
@@ -117,6 +123,12 @@ function extractOrderInfo(transaction) {
       result.lng = parsed.lng;
     }
   } catch (err) { console.error('No se pudo parsear orderInfo2 (delivery):', rawDelivery); }
+
+  try {
+    if (rawCustomer) {
+      result.customer = typeof rawCustomer === 'string' ? JSON.parse(rawCustomer) : rawCustomer;
+    }
+  } catch (err) { console.error('No se pudo parsear orderInfo3 (customer):', rawCustomer); }
 
   return result;
 }

@@ -120,13 +120,26 @@ module.exports = async (req, res) => {
   const total = subtotal + deliveryFee;
   const orderId = `SP${Date.now()}`;
 
+  // Respaldo del cliente: en producción, Izipay no siempre echa de vuelta
+  // billingDetails en la notificación de pago (confirmado con órdenes reales
+  // donde llegó "No disponible" pese a habérselo mandado) — así que además de
+  // enviarlo en customer.billingDetails, lo mandamos nosotros mismos en
+  // orderInfo3 para que notify.js siempre tenga de dónde leerlo.
+  const orderInfo3 = JSON.stringify({
+    firstName: customer.firstName,
+    lastName: customer.lastName,
+    phone: customer.phone,
+    email: customer.email,
+  });
+
   const payload = {
     amount: total * 100,
     currency: 'PEN',
     orderId,
     orderInfo,
     orderInfo2,
-    metadata: { cart: orderInfo, delivery: orderInfo2 },
+    orderInfo3,
+    metadata: { cart: orderInfo, delivery: orderInfo2, customer: orderInfo3 },
     customer: {
       email: customer.email,
       billingDetails: {
