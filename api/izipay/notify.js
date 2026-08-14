@@ -60,6 +60,21 @@ module.exports = async (req, res) => {
 
   console.log(`Izipay IPN: orden ${orderId} → ${orderStatus} (tx ${transactionUuid})`);
 
+  // Cuando el pago NO se aprueba, "UNPAID" por sí solo no dice por qué (tarjeta
+  // rechazada por el banco, fondos insuficientes, regla antifraude de Izipay,
+  // etc.) — logueamos el detalle completo de la transacción para poder leer el
+  // motivo real en los logs de Vercel sin tener que llamar a la API Order/Get.
+  if (orderStatus !== 'PAID' && transaction) {
+    console.error(`Izipay IPN: detalle del rechazo para ${orderId}:`, JSON.stringify({
+      status: transaction.status,
+      detailedStatus: transaction.detailedStatus,
+      errorCode: transaction.errorCode,
+      errorMessage: transaction.errorMessage,
+      detailedErrorCode: transaction.detailedErrorCode,
+      detailedErrorMessage: transaction.detailedErrorMessage,
+    }));
+  }
+
   if (orderStatus === 'PAID') {
     const amount = transaction && typeof transaction.amount === 'number' ? transaction.amount / 100 : null;
     const customer = transaction && transaction.customer;
