@@ -1,4 +1,10 @@
-const { computeCartTotal, computeDeliveryFee, validateDeliveryDate } = require('../../lib/pricing');
+const {
+  computeCartTotal,
+  computeDeliveryFee,
+  validateDeliveryDate,
+  computeSubscriptionPrice,
+  computeSubscriptionShipping,
+} = require('../../lib/pricing');
 
 const IZIPAY_API_URL = 'https://api.micuentaweb.pe/api-payment/V4/Charge/CreatePayment';
 
@@ -18,68 +24,118 @@ module.exports = async (req, res) => {
   }
 
   const body = req.body || {};
-  const cart = body.cart;
+  const orderType = body.orderType === 'subscription' ? 'subscription' : 'cart';
   const customer = body.customer || {};
-  const delivery = body.delivery || {};
-  const deliveryType = delivery.type || 'pickup';
-
-  let subtotal;
-  try {
-    subtotal = computeCartTotal(cart);
-  } catch (err) {
-    return res.status(400).json({ error: err.message });
-  }
 
   if (!customer.email || !customer.firstName || !customer.lastName || !customer.phone) {
     return res.status(400).json({ error: 'Faltan datos del cliente (nombre, apellido, email o teléfono).' });
   }
 
-  if (deliveryType === 'delivery' && (!customer.address || !delivery.district)) {
-    return res.status(400).json({ error: 'Faltan el distrito o la dirección de entrega.' });
-  }
-
-  try {
-    validateDeliveryDate(delivery.date);
-  } catch (err) {
-    return res.status(400).json({ error: err.message });
-  }
-
+  let subtotal;
   let deliveryFee;
-  try {
-    deliveryFee = computeDeliveryFee(deliveryType, delivery.district, delivery.date, subtotal);
-  } catch (err) {
-    return res.status(400).json({ error: err.message });
+  let orderInfo;
+  let orderInfo2;
+  let billingCity;
+  let billingAddress;
+
+  if (orderType === 'subscription') {
+    const subscription = body.subscription || {};
+    const { planCode, cadence, dog, district, address, lat, lng } = subscription;
+
+    if (!dog || !dog.name || !dog.weight || !dog.birthday) {
+      return res.status(400).json({ error: 'Faltan los datos del perro (nombre, peso o cumpleaños).' });
+    }
+    if (!district) {
+      return res.status(400).json({ error: 'Falta el distrito de entrega.' });
+    }
+
+    let priceInfo;
+    try {
+      priceInfo = computeSubscriptionPrice(planCode, cadence);
+    } catch (err) {
+      return res.status(400).json({ error: err.message });
+    }
+
+    try {
+      deliveryFee = computeSubscriptionShipping(planCode, cadence, district);
+    } catch (err) {
+      return res.status(400).json({ error: err.message });
+    }
+
+    subtotal = priceInfo.price;
+    billingCity = district;
+    billingAddress = address || 'Lima, Perú';
+
+    orderInfo = JSON.stringify({
+      type: 'subscription',
+      planCode,
+      cadence,
+      gummies: priceInfo.gummies,
+      dog: { name: dog.name, weight: dog.weight, birthday: dog.birthday },
+    });
+    orderInfo2 = JSON.stringify({ type: 'delivery', district, address: billingAddress, lat: lat || null, lng: lng || null });
+  } else {
+    const cart = body.cart;
+    const delivery = body.delivery || {};
+    const deliveryType = delivery.type || 'pickup';
+
+    try {
+      subtotal = computeCartTotal(cart);
+    } catch (err) {
+      return res.status(400).json({ error: err.message });
+    }
+
+    if (deliveryType === 'delivery' && (!customer.address || !delivery.district)) {
+      return res.status(400).json({ error: 'Faltan el distrito o la dirección de entrega.' });
+    }
+
+    try {
+      validateDeliveryDate(delivery.date);
+    } catch (err) {
+      return res.status(400).json({ error: err.message });
+    }
+
+    try {
+      deliveryFee = computeDeliveryFee(deliveryType, delivery.district, delivery.date, subtotal);
+    } catch (err) {
+      return res.status(400).json({ error: err.message });
+    }
+
+    billingCity = customer.city || 'Lima';
+    billingAddress = customer.address || 'Lima, Perú';
+
+    // Izipay solo conoce el monto — el carrito y las coordenadas del mapa viajan como
+    // texto en orderInfo/orderInfo2 (y de respaldo en metadata) para que el webhook de
+    // notificación pueda incluirlos en el aviso de email/WhatsApp.
+    orderInfo = JSON.stringify(cart.map((i) => ({ f: i.flavor, u: i.units, q: i.qty })));
+    orderInfo2 = JSON.stringify({
+      type: deliveryType,
+      district: delivery.district || null,
+      address: billingAddress,
+      lat: delivery.lat || null,
+      lng: delivery.lng || null,
+    });
   }
 
   const total = subtotal + deliveryFee;
   const orderId = `SP${Date.now()}`;
 
-  // Izipay solo conoce el monto — el carrito y las coordenadas del mapa viajan como
-  // texto en orderInfo/orderInfo2 (y de respaldo en metadata) para que el webhook de
-  // notificación pueda incluirlos en el aviso de email/WhatsApp.
-  const cartInfo = JSON.stringify(cart.map((i) => ({ f: i.flavor, u: i.units, q: i.qty })));
-  const deliveryInfo = JSON.stringify({
-    type: deliveryType,
-    lat: delivery.lat || null,
-    lng: delivery.lng || null,
-  });
-
   const payload = {
     amount: total * 100,
     currency: 'PEN',
     orderId,
-    orderInfo: cartInfo,
-    orderInfo2: deliveryInfo,
-    metadata: { cart: cartInfo, delivery: deliveryInfo },
+    orderInfo,
+    orderInfo2,
+    metadata: { cart: orderInfo, delivery: orderInfo2 },
     customer: {
       email: customer.email,
       billingDetails: {
         firstName: customer.firstName,
         lastName: customer.lastName,
         phoneNumber: customer.phone,
-        address: customer.address || 'Lima, Perú',
+        address: billingAddress,
         country: 'PE',
-        city: customer.city || 'Lima',
+        city: billingCity,
         state: 'Lima',
         zipCode: customer.zipCode || '15000',
         ...(customer.identityCode ? { identityType: 'DNI', identityCode: customer.identityCode } : {}),

@@ -67,9 +67,13 @@ module.exports = async (req, res) => {
       email: customer && customer.email,
       name: billing ? [billing.firstName, billing.lastName].filter(Boolean).join(' ') : null,
       phone: billing && billing.phoneNumber,
-      address: billing && billing.address,
-      district: billing && billing.city,
+      // billingDetails viene de vuelta desde Izipay, pero por si acaso lo omite,
+      // usamos como respaldo lo que nosotros mismos mandamos en orderInfo2.
+      address: (billing && billing.address) || orderInfo.address,
+      district: (billing && billing.city) || orderInfo.district,
+      type: orderInfo.type,
       cart: orderInfo.cart,
+      subscription: orderInfo.subscription,
       deliveryType: orderInfo.deliveryType,
       lat: orderInfo.lat,
       lng: orderInfo.lng,
@@ -82,20 +86,33 @@ module.exports = async (req, res) => {
   return res.status(200).send(`OK! OrderStatus is ${orderStatus}`);
 };
 
-// El carrito/distrito/coordenadas viajan en orderInfo/orderInfo2 (o metadata como respaldo),
-// ya que Izipay solo conoce el monto — nunca los productos comprados.
+// El carrito (o los datos de suscripción)/distrito/coordenadas viajan en orderInfo/orderInfo2
+// (o metadata como respaldo), ya que Izipay solo conoce el monto — nunca lo que se compró.
 function extractOrderInfo(transaction) {
-  const result = { cart: [], deliveryType: null, lat: null, lng: null };
+  const result = { type: 'cart', cart: [], subscription: null, deliveryType: null, district: null, address: null, lat: null, lng: null };
   if (!transaction) return result;
 
-  const rawCart = transaction.orderInfo || (transaction.metadata && transaction.metadata.cart);
+  const rawOrderInfo = transaction.orderInfo || (transaction.metadata && transaction.metadata.cart);
   const rawDelivery = transaction.orderInfo2 || (transaction.metadata && transaction.metadata.delivery);
 
-  try { if (rawCart) result.cart = JSON.parse(rawCart); } catch (err) { console.error('No se pudo parsear orderInfo (cart):', rawCart); }
+  try {
+    if (rawOrderInfo) {
+      const parsed = JSON.parse(rawOrderInfo);
+      if (Array.isArray(parsed)) {
+        result.cart = parsed;
+      } else if (parsed && parsed.type === 'subscription') {
+        result.type = 'subscription';
+        result.subscription = parsed;
+      }
+    }
+  } catch (err) { console.error('No se pudo parsear orderInfo:', rawOrderInfo); }
+
   try {
     if (rawDelivery) {
       const parsed = typeof rawDelivery === 'string' ? JSON.parse(rawDelivery) : rawDelivery;
       result.deliveryType = parsed.type;
+      result.district = parsed.district || null;
+      result.address = parsed.address || null;
       result.lat = parsed.lat;
       result.lng = parsed.lng;
     }
@@ -109,26 +126,41 @@ function cartLines(cart) {
   return cart.map((i) => `${i.f} × ${i.u}u × ${i.q} paquete(s)`).join(', ');
 }
 
+function subscriptionSummary(sub) {
+  if (!sub) return 'No disponible (revisar con el cliente)';
+  const cadenceLabel = sub.cadence === 'quarterly' ? 'Trimestral' : 'Mensual';
+  const dog = sub.dog || {};
+  return `Suscripción ${sub.planCode || '?'} ${cadenceLabel} — ${sub.gummies || '?'} gomitas — Perro: ${dog.name || '?'} (${dog.weight || '?'} kg, cumple ${dog.birthday || '?'})`;
+}
+
+function orderSummary(d) {
+  return d.type === 'subscription' ? subscriptionSummary(d.subscription) : cartLines(d.cart);
+}
+
 async function notifyEmail(d) {
   const apiKey = process.env.RESEND_API_KEY;
   const to = process.env.NOTIFY_EMAIL_TO;
   if (!apiKey || !to) return;
 
   const amountText = d.amount != null ? `S/ ${d.amount}` : 'monto no disponible';
-  const mapLink = d.lat && d.lng ? `<p>Ubicación: <a href="https://www.google.com/maps?q=${d.lat},${d.lng}">ver en Google Maps</a></p>` : '';
+  const mapLink = d.lat && d.lng ? `<p>Ubicación (mapa): <a href="https://www.google.com/maps?q=${d.lat},${d.lng}">ver en Google Maps</a></p>` : '';
+  const subjectPrefix = d.type === 'subscription' ? '🐾 Nueva suscripción pagada' : '🐾 Nuevo pago recibido';
   const res = await fetch('https://api.resend.com/emails', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${apiKey}` },
     body: JSON.stringify({
       from: 'Santa Patita <onboarding@resend.dev>',
       to: [to],
-      subject: `🐾 Nuevo pago recibido — ${d.orderId}`,
-      html: `<p><strong>¡Nuevo pedido pagado!</strong></p>
+      subject: `${subjectPrefix} — ${d.orderId}`,
+      html: `<p><strong>¡Nuevo pago confirmado!</strong></p>
         <p>N° de orden: <strong>${d.orderId}</strong></p>
         <p>Monto: <strong>${amountText}</strong></p>
-        <p>Pedido: <strong>${cartLines(d.cart)}</strong></p>
-        <p>Cliente: ${d.name || 'No disponible'} ${d.phone ? '· ' + d.phone : ''} ${d.email ? '· ' + d.email : ''}</p>
-        <p>Entrega: ${d.deliveryType === 'delivery' ? 'Delivery' : 'Recojo en tienda'}${d.district ? ' — ' + d.district : ''}${d.address ? ' — ' + d.address : ''}</p>
+        <p>Pedido: <strong>${orderSummary(d)}</strong></p>
+        <p>Cliente: <strong>${d.name || 'No disponible'}</strong></p>
+        <p>Teléfono / WhatsApp: <strong>${d.phone || 'No disponible'}</strong></p>
+        <p>Email: ${d.email || 'No disponible'}</p>
+        <p>Entrega: ${d.deliveryType === 'delivery' ? 'Delivery' : 'Recojo en tienda'}${d.district ? ' — ' + d.district : ''}</p>
+        <p>Dirección: <strong>${d.address || 'No disponible (revisar con el cliente)'}</strong></p>
         ${mapLink}`,
     }),
   });
@@ -141,11 +173,15 @@ async function notifyWhatsapp(d) {
   if (!phone || !apiKey) return;
 
   const amountText = d.amount != null ? `S/ ${d.amount}` : 'monto no disponible';
-  let text = `🐾 Nuevo pago recibido\nOrden: ${d.orderId}\nMonto: ${amountText}\n`;
-  text += `Pedido: ${cartLines(d.cart)}\n`;
-  text += `Cliente: ${d.name || 'No disponible'}${d.phone ? ' · ' + d.phone : ''}${d.email ? ' · ' + d.email : ''}\n`;
-  text += `Entrega: ${d.deliveryType === 'delivery' ? 'Delivery' : 'Recojo en tienda'}${d.district ? ' — ' + d.district : ''}${d.address ? ' — ' + d.address : ''}\n`;
-  if (d.lat && d.lng) text += `Ubicación: https://www.google.com/maps?q=${d.lat},${d.lng}\n`;
+  const titleLine = d.type === 'subscription' ? '🐾 Nueva suscripción pagada' : '🐾 Nuevo pago recibido';
+  let text = `${titleLine}\nOrden: ${d.orderId}\nMonto: ${amountText}\n`;
+  text += `Pedido: ${orderSummary(d)}\n`;
+  text += `Cliente: ${d.name || 'No disponible'}\n`;
+  text += `Teléfono/WhatsApp: ${d.phone || 'No disponible'}\n`;
+  if (d.email) text += `Email: ${d.email}\n`;
+  text += `Entrega: ${d.deliveryType === 'delivery' ? 'Delivery' : 'Recojo en tienda'}${d.district ? ' — ' + d.district : ''}\n`;
+  text += `Dirección: ${d.address || 'No disponible (revisar con el cliente)'}\n`;
+  if (d.lat && d.lng) text += `Ubicación (mapa): https://www.google.com/maps?q=${d.lat},${d.lng}\n`;
 
   const url = `https://api.callmebot.com/whatsapp.php?phone=${encodeURIComponent(phone)}&text=${encodeURIComponent(text)}&apikey=${encodeURIComponent(apiKey)}`;
   const res = await fetch(url);
