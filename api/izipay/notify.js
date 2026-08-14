@@ -137,9 +137,18 @@ function extractOrderInfo(transaction) {
   return result;
 }
 
-function cartLines(cart) {
+function cartItemLine(i) {
+  const priceText = typeof i.a === 'number' ? ` — S/ ${i.a}` : '';
+  return `${i.f} × ${i.u}u × ${i.q} paquete(s)${priceText}`;
+}
+
+// format 'html' -> lista <ul>/<li> para el correo; format 'text' (default) ->
+// líneas con viñeta "•" para el WhatsApp, más ordenado que separarlas por comas.
+function cartLines(cart, format) {
   if (!Array.isArray(cart) || cart.length === 0) return 'No disponible (revisar con el cliente)';
-  return cart.map((i) => `${i.f} × ${i.u}u × ${i.q} paquete(s)`).join(', ');
+  const lines = cart.map(cartItemLine);
+  if (format === 'html') return `<ul style="margin:4px 0;padding-left:20px;">${lines.map((l) => `<li>${l}</li>`).join('')}</ul>`;
+  return lines.map((l) => `• ${l}`).join('\n');
 }
 
 function subscriptionSummary(sub) {
@@ -149,8 +158,8 @@ function subscriptionSummary(sub) {
   return `Suscripción ${sub.planCode || '?'} ${cadenceLabel} — ${sub.gummies || '?'} gomitas — Perro: ${dog.name || '?'} (${dog.weight || '?'} kg, cumple ${dog.birthday || '?'})`;
 }
 
-function orderSummary(d) {
-  return d.type === 'subscription' ? subscriptionSummary(d.subscription) : cartLines(d.cart);
+function orderSummary(d, format) {
+  return d.type === 'subscription' ? subscriptionSummary(d.subscription) : cartLines(d.cart, format);
 }
 
 // Izipay solo confirma el total cobrado — el desglose producto/envío viaja en
@@ -181,6 +190,9 @@ async function notifyEmail(d) {
     : `<p>Monto: <strong>${b.totalText}</strong></p>`;
   const mapLink = d.lat && d.lng ? `<p>Ubicación (mapa): <a href="https://www.google.com/maps?q=${d.lat},${d.lng}">ver en Google Maps</a></p>` : '';
   const subjectPrefix = d.type === 'subscription' ? '🐾 Nueva suscripción pagada' : '🐾 Nuevo pago recibido';
+  const pedidoBlock = d.type === 'subscription'
+    ? `<p>Pedido: <strong>${orderSummary(d)}</strong></p>`
+    : `<p>Pedido:</p>${orderSummary(d, 'html')}`;
   const res = await fetch('https://api.resend.com/emails', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${apiKey}` },
@@ -191,7 +203,7 @@ async function notifyEmail(d) {
       html: `<p><strong>¡Nuevo pago confirmado!</strong></p>
         <p>N° de orden: <strong>${d.orderId}</strong></p>
         ${amountLines}
-        <p>Pedido: <strong>${orderSummary(d)}</strong></p>
+        ${pedidoBlock}
         <p>Cliente: <strong>${d.name || 'No disponible'}</strong></p>
         <p>Teléfono / WhatsApp: <strong>${d.phone || 'No disponible'}</strong></p>
         <p>Email: ${d.email || 'No disponible'}</p>
@@ -219,7 +231,9 @@ async function notifyWhatsapp(d) {
   text += b.hasBreakdown
     ? `Producto: ${b.productText}\nEnvío: ${b.shippingText}\nTotal: ${b.totalText}\n`
     : `Monto: ${b.totalText}\n`;
-  text += `Pedido: ${orderSummary(d)}\n`;
+  text += d.type === 'subscription'
+    ? `Pedido: ${orderSummary(d)}\n`
+    : `Pedido:\n${orderSummary(d, 'text')}\n`;
   text += `Cliente: ${d.name || 'No disponible'}\n`;
   text += `Teléfono/WhatsApp: ${d.phone || 'No disponible'}\n`;
   if (d.email) text += `Email: ${d.email}\n`;

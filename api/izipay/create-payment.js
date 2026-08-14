@@ -1,4 +1,5 @@
 const {
+  FLAVOR_PRICING,
   computeCartTotal,
   computeDeliveryFee,
   validateDeliveryDate,
@@ -115,7 +116,14 @@ module.exports = async (req, res) => {
     // Izipay solo conoce el monto — el carrito y las coordenadas del mapa viajan como
     // texto en orderInfo/orderInfo2 (y de respaldo en metadata) para que el webhook de
     // notificación pueda incluirlos en el aviso de email/WhatsApp.
-    orderInfo = JSON.stringify(cart.map((i) => ({ f: i.flavor, u: i.units, q: i.qty })));
+    // Guardamos también el monto de cada línea (ya validado por computeCartTotal
+    // arriba) para que la notificación pueda mostrar precio por ítem, no solo el total.
+    orderInfo = JSON.stringify(cart.map((i) => ({
+      f: i.flavor,
+      u: i.units,
+      q: i.qty,
+      a: FLAVOR_PRICING[i.flavor][i.units] * i.qty,
+    })));
     orderInfo2 = JSON.stringify({
       type: deliveryType,
       district: delivery.district || null,
