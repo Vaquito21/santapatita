@@ -76,6 +76,8 @@ module.exports = async (req, res) => {
       phone: (billing && billing.phoneNumber) || fallbackCustomer.phone,
       address: (billing && billing.address) || orderInfo.address,
       district: (billing && billing.city) || orderInfo.district,
+      subtotal: orderInfo.subtotal,
+      deliveryFee: orderInfo.deliveryFee,
       type: orderInfo.type,
       cart: orderInfo.cart,
       subscription: orderInfo.subscription,
@@ -94,7 +96,7 @@ module.exports = async (req, res) => {
 // El carrito (o los datos de suscripción)/distrito/coordenadas viajan en orderInfo/orderInfo2
 // (o metadata como respaldo), ya que Izipay solo conoce el monto — nunca lo que se compró.
 function extractOrderInfo(transaction) {
-  const result = { type: 'cart', cart: [], subscription: null, deliveryType: null, district: null, address: null, customer: null, lat: null, lng: null };
+  const result = { type: 'cart', cart: [], subscription: null, deliveryType: null, district: null, address: null, subtotal: null, deliveryFee: null, customer: null, lat: null, lng: null };
   if (!transaction) return result;
 
   const rawOrderInfo = transaction.orderInfo || (transaction.metadata && transaction.metadata.cart);
@@ -119,6 +121,8 @@ function extractOrderInfo(transaction) {
       result.deliveryType = parsed.type;
       result.district = parsed.district || null;
       result.address = parsed.address || null;
+      result.subtotal = typeof parsed.subtotal === 'number' ? parsed.subtotal : null;
+      result.deliveryFee = typeof parsed.deliveryFee === 'number' ? parsed.deliveryFee : null;
       result.lat = parsed.lat;
       result.lng = parsed.lng;
     }
@@ -149,12 +153,32 @@ function orderSummary(d) {
   return d.type === 'subscription' ? subscriptionSummary(d.subscription) : cartLines(d.cart);
 }
 
+// Izipay solo confirma el total cobrado — el desglose producto/envío viaja en
+// orderInfo2 (ver create-payment.js), así que si por algo no llegó, degradamos
+// a mostrar solo el total en vez de dejar campos vacíos o inventar un desglose.
+function amountBreakdown(d) {
+  if (d.subtotal == null || d.deliveryFee == null) {
+    return { hasBreakdown: false, totalText: d.amount != null ? `S/ ${d.amount}` : 'monto no disponible' };
+  }
+  return {
+    hasBreakdown: true,
+    productText: `S/ ${d.subtotal}`,
+    shippingText: d.deliveryFee === 0 ? 'Gratis' : `S/ ${d.deliveryFee}`,
+    totalText: d.amount != null ? `S/ ${d.amount}` : `S/ ${d.subtotal + d.deliveryFee}`,
+  };
+}
+
 async function notifyEmail(d) {
   const apiKey = process.env.RESEND_API_KEY;
   const to = process.env.NOTIFY_EMAIL_TO;
   if (!apiKey || !to) return;
 
-  const amountText = d.amount != null ? `S/ ${d.amount}` : 'monto no disponible';
+  const b = amountBreakdown(d);
+  const amountLines = b.hasBreakdown
+    ? `<p>Monto producto: <strong>${b.productText}</strong></p>
+        <p>Monto envío: <strong>${b.shippingText}</strong></p>
+        <p>Monto total: <strong>${b.totalText}</strong></p>`
+    : `<p>Monto: <strong>${b.totalText}</strong></p>`;
   const mapLink = d.lat && d.lng ? `<p>Ubicación (mapa): <a href="https://www.google.com/maps?q=${d.lat},${d.lng}">ver en Google Maps</a></p>` : '';
   const subjectPrefix = d.type === 'subscription' ? '🐾 Nueva suscripción pagada' : '🐾 Nuevo pago recibido';
   const res = await fetch('https://api.resend.com/emails', {
@@ -166,7 +190,7 @@ async function notifyEmail(d) {
       subject: `${subjectPrefix} — ${d.orderId}`,
       html: `<p><strong>¡Nuevo pago confirmado!</strong></p>
         <p>N° de orden: <strong>${d.orderId}</strong></p>
-        <p>Monto: <strong>${amountText}</strong></p>
+        ${amountLines}
         <p>Pedido: <strong>${orderSummary(d)}</strong></p>
         <p>Cliente: <strong>${d.name || 'No disponible'}</strong></p>
         <p>Teléfono / WhatsApp: <strong>${d.phone || 'No disponible'}</strong></p>
@@ -189,9 +213,12 @@ async function notifyWhatsapp(d) {
   ].filter((r) => r.phone && r.apiKey);
   if (recipients.length === 0) return;
 
-  const amountText = d.amount != null ? `S/ ${d.amount}` : 'monto no disponible';
+  const b = amountBreakdown(d);
   const titleLine = d.type === 'subscription' ? '🐾 Nueva suscripción pagada' : '🐾 Nuevo pago recibido';
-  let text = `${titleLine}\nOrden: ${d.orderId}\nMonto: ${amountText}\n`;
+  let text = `${titleLine}\nOrden: ${d.orderId}\n`;
+  text += b.hasBreakdown
+    ? `Producto: ${b.productText}\nEnvío: ${b.shippingText}\nTotal: ${b.totalText}\n`
+    : `Monto: ${b.totalText}\n`;
   text += `Pedido: ${orderSummary(d)}\n`;
   text += `Cliente: ${d.name || 'No disponible'}\n`;
   text += `Teléfono/WhatsApp: ${d.phone || 'No disponible'}\n`;

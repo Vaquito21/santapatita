@@ -73,7 +73,15 @@ module.exports = async (req, res) => {
       gummies: priceInfo.gummies,
       dog: { name: dog.name, weight: dog.weight, birthday: dog.birthday },
     });
-    orderInfo2 = JSON.stringify({ type: 'delivery', district, address: billingAddress, lat: lat || null, lng: lng || null });
+    orderInfo2 = JSON.stringify({
+      type: 'delivery',
+      district,
+      address: billingAddress,
+      subtotal,
+      deliveryFee,
+      lat: lat || null,
+      lng: lng || null,
+    });
   } else {
     const cart = body.cart;
     const delivery = body.delivery || {};
@@ -112,6 +120,8 @@ module.exports = async (req, res) => {
       type: deliveryType,
       district: delivery.district || null,
       address: billingAddress,
+      subtotal,
+      deliveryFee,
       lat: delivery.lat || null,
       lng: delivery.lng || null,
     });
