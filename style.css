@@ -321,15 +321,30 @@ a { text-decoration: none; color: inherit; }
 .section__sub { color: var(--muted); font-size: .98rem; }
 
 /* ═══════════════════════════════════════════ PRODUCT INFO ══ */
-.product-info {
-  background: white; border-radius: var(--radius-lg); padding: 28px 32px;
-  box-shadow: var(--shadow); max-width: 760px; margin: 0 auto 40px;
+.product-info { max-width: 900px; margin: 0 auto 32px; }
+.product-info__grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(220px,1fr)); gap: 20px; }
+.product-info-card {
+  background: white; border-radius: var(--radius-lg); padding: 26px 24px;
+  box-shadow: var(--shadow); border: 2px solid transparent; transition: var(--t);
+  opacity: 0; transform: translateY(20px);
 }
-.product-info p { color: var(--dark2); font-size: .95rem; line-height: 1.75; margin-bottom: 12px; }
-.product-info p:last-child { margin-bottom: 0; }
-.product-info strong { color: var(--dark); }
-.product-info__dose { color: var(--sky-d); font-weight: 800; }
-.product-info__vet { font-size: .82rem; color: var(--muted); font-style: italic; }
+.product-info-card.visible { opacity: 1; transform: none; }
+.product-info-card:hover { border-color: var(--sky); transform: translateY(-6px); box-shadow: var(--shadow-lg); }
+.product-info-card--dose { border-color: rgba(37,150,228,.35); background: linear-gradient(160deg, var(--sky-l) 0%, white 55%); }
+.product-info-card--cold { border-color: rgba(247,198,24,.5); background: linear-gradient(160deg, #fff8dc 0%, white 55%); }
+.product-info-card__icon {
+  width: 52px; height: 52px; border-radius: 50%; display: flex; align-items: center;
+  justify-content: center; font-size: 1.6rem; margin-bottom: 14px; background: var(--sky-l);
+}
+.product-info-card--cold .product-info-card__icon { background: #fff3c4; }
+.product-info-card__title { font-weight: 900; font-size: 1rem; color: var(--dark); margin-bottom: 8px; }
+.product-info-card__text { font-size: .87rem; color: var(--muted); line-height: 1.65; }
+.product-info-card__text strong { color: var(--dark); }
+.product-info__dose {
+  display: inline-block; background: var(--sky); color: white; font-weight: 800;
+  padding: 2px 12px; border-radius: 50px; font-size: .92em; margin-top: 4px;
+}
+.product-info__vet { text-align: center; font-size: .82rem; color: var(--muted); font-style: italic; margin-top: 20px; }
 
 /* ═══════════════════════════════════════════ BENEFITS ══ */
 .benefits__grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 24px; }

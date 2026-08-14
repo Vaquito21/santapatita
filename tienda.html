@@ -50,10 +50,24 @@
     </div>
 
     <div class="product-info">
-      <p>Colágeno natural en formato gomita, hecho a mano en Lima en lotes pequeños. Sin químicos, sin conservantes, sin uñas. Aporta colágeno, que contribuye a la salud de las articulaciones y el pelaje de tu perro.</p>
-      <p>Textura blanda: fácil de comer para perros de todas las edades, especialmente perros senior. <span class="product-info__dose">Dosis: desde 1 gomita al día.</span></p>
-      <p><strong>CONSERVAR EN CONGELADORA.</strong> Congelado: 6 meses. Refrigeradora: 5 días. Fuera del frío: consumir el mismo día.</p>
-      <p class="product-info__vet">No reemplaza la consulta veterinaria.</p>
+      <div class="product-info__grid">
+        <div class="product-info-card">
+          <span class="product-info-card__icon">🦴</span>
+          <div class="product-info-card__title">Colágeno natural</div>
+          <p class="product-info-card__text">Colágeno natural en formato gomita, hecho a mano en Lima en lotes pequeños. Sin químicos, sin conservantes, sin uñas. Aporta colágeno, que contribuye a la salud de las articulaciones y el pelaje de tu perro.</p>
+        </div>
+        <div class="product-info-card product-info-card--dose">
+          <span class="product-info-card__icon">🥣</span>
+          <div class="product-info-card__title">Textura blanda</div>
+          <p class="product-info-card__text">Textura blanda: fácil de comer para perros de todas las edades, especialmente perros senior.<br/><span class="product-info__dose">Dosis: desde 1 gomita al día.</span></p>
+        </div>
+        <div class="product-info-card product-info-card--cold">
+          <span class="product-info-card__icon">❄️</span>
+          <div class="product-info-card__title">Conservación</div>
+          <p class="product-info-card__text"><strong>CONSERVAR EN CONGELADORA.</strong> Congelado: 6 meses. Refrigeradora: 5 días. Fuera del frío: consumir el mismo día.</p>
+        </div>
+      </div>
+      <p class="product-info__vet">🩺 No reemplaza la consulta veterinaria.</p>
     </div>
 
     <!-- ORDEN BUILDER -->
@@ -701,7 +715,7 @@ document.querySelectorAll('a[href^="#"]').forEach(a => {
 
 // ── Animate on scroll ──
 const io = new IntersectionObserver(entries => entries.forEach(e => { if(e.isIntersecting) e.target.classList.add('visible'); }), {threshold:.1});
-document.querySelectorAll('.benefit-card,.store-card,.delivery-box,.flavor-card,.size-card').forEach(el => io.observe(el));
+document.querySelectorAll('.benefit-card,.store-card,.delivery-box,.flavor-card,.size-card,.product-info-card').forEach(el => io.observe(el));
 
 restoreCart();
 </script>
