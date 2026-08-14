@@ -50,6 +50,26 @@
     });
     marker = new google.maps.Marker({ map, position: LIMA_CENTER, draggable: true });
 
+    // Si la dirección ya trae un pin restaurado (de una compra anterior) lo
+    // mostramos de una vez, para que el cliente no tenga que volver a ubicarlo.
+    const savedLat = parseFloat(document.getElementById('deliveryLat').value);
+    const savedLng = parseFloat(document.getElementById('deliveryLng').value);
+    if (!isNaN(savedLat) && !isNaN(savedLng)) {
+      const pos = { lat: savedLat, lng: savedLng };
+      map.setCenter(pos);
+      map.setZoom(17);
+      marker.setPosition(pos);
+    }
+
+    // Si el cliente edita la dirección a mano (sin elegir una sugerencia del
+    // autocompletado ni arrastrar el pin), el lat/lng restaurado ya no
+    // corresponde al texto nuevo — lo limpiamos para no mandar una ubicación
+    // equivocada.
+    addressInput.addEventListener('input', () => {
+      document.getElementById('deliveryLat').value = '';
+      document.getElementById('deliveryLng').value = '';
+    });
+
     const geocoder = new google.maps.Geocoder();
 
     marker.addListener('dragend', () => {

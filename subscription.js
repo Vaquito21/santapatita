@@ -180,6 +180,18 @@
       if (el && !el.value && fields[id]) el.value = fields[id];
     });
 
+    // La dirección guardada viaja junto con el pin que se confirmó la última
+    // vez (en esta página o en la tienda, comparten el mismo storage) — sin
+    // esto, el campo se rellena pero el mapa queda "vacío" y hay que volver a
+    // ubicar el pin de cero.
+    const addressEl = document.getElementById('deliveryAddress');
+    if (addressEl && addressEl.value === saved.address) {
+      const latEl = document.getElementById('deliveryLat');
+      const lngEl = document.getElementById('deliveryLng');
+      if (latEl && saved.lat) latEl.value = saved.lat;
+      if (lngEl && saved.lng) lngEl.value = saved.lng;
+    }
+
     const districtEl = document.getElementById('districtSelect');
     if (districtEl && !districtEl.value && saved.district && DISTRICT_FEES[saved.district] !== undefined) {
       districtEl.value = saved.district;
@@ -365,7 +377,7 @@
     const lat = document.getElementById('deliveryLat').value;
     const lng = document.getElementById('deliveryLng').value;
 
-    saveCustomerData({ firstName: owner.firstName, lastName: owner.lastName, email: owner.email, phone: owner.phone, address, district });
+    saveCustomerData({ firstName: owner.firstName, lastName: owner.lastName, email: owner.email, phone: owner.phone, address, district, lat: lat || null, lng: lng || null });
 
     const payload = {
       orderType: 'subscription',

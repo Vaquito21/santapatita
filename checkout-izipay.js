@@ -23,7 +23,16 @@
 
     const addressEl = document.getElementById('deliveryAddress');
     const districtEl = document.getElementById('districtSelect');
-    if (addressEl && !addressEl.value && saved.address) addressEl.value = saved.address;
+    if (addressEl && !addressEl.value && saved.address) {
+      addressEl.value = saved.address;
+      // La dirección guardada viaja junto con el pin que el cliente confirmó la
+      // última vez — sin esto, el campo se rellena pero el mapa queda "vacío"
+      // (sin lat/lng) y el cliente tiene que volver a ubicar el pin de cero.
+      const latEl = document.getElementById('deliveryLat');
+      const lngEl = document.getElementById('deliveryLng');
+      if (latEl && saved.lat) latEl.value = saved.lat;
+      if (lngEl && saved.lng) lngEl.value = saved.lng;
+    }
     if (districtEl && !districtEl.value && saved.district) districtEl.value = saved.district;
 
     const firstNameEl = document.getElementById('izipayFirstName');
@@ -73,7 +82,7 @@
           <div class="izipay-field"><label>Apellido</label><input type="text" id="izipayLastName" placeholder="Gómez"/></div>
           <div class="izipay-field"><label>Email</label><input type="email" id="izipayEmail" placeholder="maria@correo.com"/></div>
           <div class="izipay-field"><label>Teléfono</label><input type="tel" id="izipayPhone" placeholder="987654321"/></div>
-          <div class="izipay-field"><label>DNI <span class="izipay-field__hint">(opcional, mejora la aprobación del pago)</span></label><input type="text" id="izipayDni" placeholder="12345678" maxlength="8"/></div>
+          <div class="izipay-field"><label>DNI <span class="izipay-field__hint">(opcional, para tu boleta o factura)</span></label><input type="text" id="izipayDni" placeholder="12345678" maxlength="8"/></div>
           <p class="izipay-error" id="izipayError" style="display:none;"></p>
           <button type="button" class="btn btn--sky btn--full" id="izipayContinueBtn">Continuar al pago 🔒</button>
         </div>
@@ -163,14 +172,14 @@
       return;
     }
 
-    saveCustomerData({ firstName, lastName, email, phone, address, district });
+    const lat = document.getElementById('deliveryLat').value;
+    const lng = document.getElementById('deliveryLng').value;
+
+    saveCustomerData({ firstName, lastName, email, phone, address, district, lat: lat || null, lng: lng || null });
 
     const btn = document.getElementById('izipayContinueBtn');
     btn.disabled = true;
     btn.textContent = 'Procesando...';
-
-    const lat = document.getElementById('deliveryLat').value;
-    const lng = document.getElementById('deliveryLng').value;
 
     const payload = {
       cart: cart.map(item => ({ flavor: item.flavor, units: item.units, qty: item.qty })),
