@@ -96,6 +96,7 @@ module.exports = async (req, res) => {
       phone: (billing && billing.phoneNumber) || fallbackCustomer.phone,
       address: (billing && billing.address) || orderInfo.address,
       district: (billing && billing.city) || orderInfo.district,
+      deliveryDate: orderInfo.deliveryDate,
       subtotal: orderInfo.subtotal,
       deliveryFee: orderInfo.deliveryFee,
       type: orderInfo.type,
@@ -116,7 +117,7 @@ module.exports = async (req, res) => {
 // El carrito (o los datos de suscripción)/distrito/coordenadas viajan en orderInfo/orderInfo2
 // (o metadata como respaldo), ya que Izipay solo conoce el monto — nunca lo que se compró.
 function extractOrderInfo(transaction) {
-  const result = { type: 'cart', cart: [], subscription: null, deliveryType: null, district: null, address: null, subtotal: null, deliveryFee: null, customer: null, lat: null, lng: null };
+  const result = { type: 'cart', cart: [], subscription: null, deliveryType: null, district: null, address: null, deliveryDate: null, subtotal: null, deliveryFee: null, customer: null, lat: null, lng: null };
   if (!transaction) return result;
 
   const rawOrderInfo = transaction.orderInfo || (transaction.metadata && transaction.metadata.cart);
@@ -141,6 +142,7 @@ function extractOrderInfo(transaction) {
       result.deliveryType = parsed.type;
       result.district = parsed.district || null;
       result.address = parsed.address || null;
+      result.deliveryDate = parsed.date || null;
       result.subtotal = typeof parsed.subtotal === 'number' ? parsed.subtotal : null;
       result.deliveryFee = typeof parsed.deliveryFee === 'number' ? parsed.deliveryFee : null;
       result.lat = parsed.lat;
@@ -155,6 +157,14 @@ function extractOrderInfo(transaction) {
   } catch (err) { console.error('No se pudo parsear orderInfo3 (customer):', rawCustomer); }
 
   return result;
+}
+
+// El <input type="date"> del checkout entrega yyyy-mm-dd; lo mostramos en
+// formato peruano dd/mm/yyyy en las notificaciones.
+function formatDeliveryDate(isoDate) {
+  if (!isoDate || !/^\d{4}-\d{2}-\d{2}$/.test(isoDate)) return null;
+  const [y, m, d] = isoDate.split('-');
+  return `${d}/${m}/${y}`;
 }
 
 function cartItemLine(i) {
@@ -282,6 +292,7 @@ async function notifyEmail(d) {
     <tr><td style="padding:4px 0;color:#7C7C9A;">Teléfono</td><td style="padding:4px 0;font-weight:700;color:#1A1A2E;">${d.phone || 'No disponible'}</td></tr>
     <tr><td style="padding:4px 0;color:#7C7C9A;">Email</td><td style="padding:4px 0;color:#2d2d44;">${d.email || 'No disponible'}</td></tr>
     <tr><td style="padding:4px 0;color:#7C7C9A;">Entrega</td><td style="padding:4px 0;color:#2d2d44;">${d.deliveryType === 'delivery' ? 'Delivery' : 'Recojo en tienda'}${d.district ? ' — ' + d.district : ''}</td></tr>
+    <tr><td style="padding:4px 0;color:#7C7C9A;">Fecha solicitada</td><td style="padding:4px 0;font-weight:700;color:#1A1A2E;">${formatDeliveryDate(d.deliveryDate) || 'No disponible (revisar con el cliente)'}</td></tr>
     <tr><td style="padding:4px 0;color:#7C7C9A;vertical-align:top;">Dirección</td><td style="padding:4px 0;color:#2d2d44;">${d.address || 'No disponible (revisar con el cliente)'}</td></tr>
   </table>`;
 
@@ -332,6 +343,7 @@ async function notifyCustomerEmail(d) {
     ${infoCard(`<div style="font-size:12px;color:#7C7C9A;font-weight:700;text-transform:uppercase;margin-bottom:6px;">N° de orden ${d.orderId}</div>${pedidoBlock}`)}
     ${infoCard(amountRowsHtml(b), { accent: 'yellow' })}
     <p style="margin:16px 0 0;">📍 <strong>Entrega:</strong> ${d.deliveryType === 'delivery' ? 'Delivery' : 'Recojo en tienda'}${d.district ? ' — ' + d.district : ''}${d.address ? ' — ' + d.address : ''}</p>
+    ${formatDeliveryDate(d.deliveryDate) ? `<p style="margin:4px 0 0;">📅 <strong>Fecha solicitada:</strong> ${formatDeliveryDate(d.deliveryDate)}</p>` : ''}
     <p style="margin:16px 0 0;color:#7C7C9A;font-size:13px;">¿Alguna consulta? Escríbenos, con gusto te ayudamos 🐾</p>
   `;
 
@@ -378,6 +390,7 @@ async function notifyWhatsapp(d) {
   text += `Teléfono/WhatsApp: ${d.phone || 'No disponible'}\n`;
   if (d.email) text += `Email: ${d.email}\n`;
   text += `Entrega: ${d.deliveryType === 'delivery' ? 'Delivery' : 'Recojo en tienda'}${d.district ? ' — ' + d.district : ''}\n`;
+  text += `Fecha solicitada: ${formatDeliveryDate(d.deliveryDate) || 'No disponible (revisar con el cliente)'}\n`;
   text += `Dirección: ${d.address || 'No disponible (revisar con el cliente)'}\n`;
   if (d.lat && d.lng) text += `Ubicación (mapa): https://www.google.com/maps?q=${d.lat},${d.lng}\n`;
 

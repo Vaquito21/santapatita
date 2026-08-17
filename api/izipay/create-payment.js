@@ -128,6 +128,7 @@ module.exports = async (req, res) => {
       type: deliveryType,
       district: delivery.district || null,
       address: billingAddress,
+      date: delivery.date || null,
       subtotal,
       deliveryFee,
       lat: delivery.lat || null,
