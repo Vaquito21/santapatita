@@ -1,16 +1,6 @@
 {
-  "cleanUrls": true,
-  "trailingSlash": false,
-  "rewrites": [
-    { "source": "/", "destination": "/maintenance" },
-    { "source": "/index.html", "destination": "/maintenance" },
-    { "source": "/tienda", "destination": "/maintenance" },
-    { "source": "/tienda.html", "destination": "/maintenance" },
-    { "source": "/nosotros", "destination": "/maintenance" },
-    { "source": "/nosotros.html", "destination": "/maintenance" },
-    { "source": "/suscripcion", "destination": "/maintenance" },
-    { "source": "/suscripcion.html", "destination": "/maintenance" },
-    { "source": "/club", "destination": "/maintenance" },
-    { "source": "/club.html", "destination": "/maintenance" }
+  "routes": [
+    { "src": "/api/(.*)", "dest": "/api/$1" },
+    { "src": "/(.*)", "dest": "/maintenance.html" }
   ]
 }
