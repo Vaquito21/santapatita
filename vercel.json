@@ -2,15 +2,15 @@
   "cleanUrls": true,
   "trailingSlash": false,
   "rewrites": [
-    { "source": "/", "destination": "/maintenance.html" },
-    { "source": "/index.html", "destination": "/maintenance.html" },
-    { "source": "/tienda", "destination": "/maintenance.html" },
-    { "source": "/tienda.html", "destination": "/maintenance.html" },
-    { "source": "/nosotros", "destination": "/maintenance.html" },
-    { "source": "/nosotros.html", "destination": "/maintenance.html" },
-    { "source": "/suscripcion", "destination": "/maintenance.html" },
-    { "source": "/suscripcion.html", "destination": "/maintenance.html" },
-    { "source": "/club", "destination": "/maintenance.html" },
-    { "source": "/club.html", "destination": "/maintenance.html" }
+    { "source": "/", "destination": "/maintenance" },
+    { "source": "/index.html", "destination": "/maintenance" },
+    { "source": "/tienda", "destination": "/maintenance" },
+    { "source": "/tienda.html", "destination": "/maintenance" },
+    { "source": "/nosotros", "destination": "/maintenance" },
+    { "source": "/nosotros.html", "destination": "/maintenance" },
+    { "source": "/suscripcion", "destination": "/maintenance" },
+    { "source": "/suscripcion.html", "destination": "/maintenance" },
+    { "source": "/club", "destination": "/maintenance" },
+    { "source": "/club.html", "destination": "/maintenance" }
   ]
 }
