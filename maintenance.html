@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Volvemos pronto — Santa Patita</title>
+  <meta name="description" content="Santa Patita está en mantenimiento. Volvemos muy pronto — mientras tanto, escríbenos por WhatsApp."/>
+  <meta name="robots" content="noindex"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet"/>
+  <!-- Vercel Web Analytics -->
+  <script>window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };</script>
+  <script defer src="/_vercel/insights/script.js"></script>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-WJM6ZJWXWN"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-WJM6ZJWXWN');
+  </script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --sky: #2596e4;
+      --sky-l: #daeefb;
+      --yellow: #F7C618;
+      --yellow-d: #E0B015;
+      --dark: #1A1A2E;
+      --dark2: #2d2d44;
+      --muted: #6b6b8a;
+      --cream: #FFFCF5;
+      --blush: #FFB3C6;
+      --bg-top: #EAF6FF;
+      --bg-bottom: #FFFDF6;
+    }
+
+    html, body { height: 100%; }
+    body { overflow-x: hidden; overflow-y: auto; }
+
+    body {
+      font-family: 'Nunito', sans-serif;
+      color: var(--dark);
+      background: linear-gradient(160deg, var(--bg-top) 0%, var(--bg-bottom) 65%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      position: relative;
+    }
+
+    /* ── Cinta de "en construcción" arriba y abajo ── */
+    .tape {
+      position: fixed; left: 0; right: 0; height: 16px; z-index: 5;
+      background: repeating-linear-gradient(
+        -45deg,
+        var(--yellow) 0 22px,
+        var(--dark) 22px 44px
+      );
+      background-size: 62px 100%;
+      box-shadow: 0 0 0 1px rgba(0,0,0,.05);
+    }
+    .tape--top { top: 0; animation: tapeScroll 3.4s linear infinite; }
+    .tape--bottom { bottom: 0; animation: tapeScroll 3.4s linear infinite reverse; }
+    @keyframes tapeScroll { from { background-position-x: 0; } to { background-position-x: 62px; } }
+
+    /* ── Nubes de fondo, quietas y suaves (mismo lenguaje visual del sitio) ── */
+    .cloud {
+      position: fixed; border-radius: 50%; background: rgba(255,255,255,.7);
+      filter: blur(1px); z-index: 0;
+    }
+    .cloud--1 { width: 220px; height: 220px; top: 8%; left: -60px; animation: drift 22s ease-in-out infinite; }
+    .cloud--2 { width: 160px; height: 160px; bottom: 12%; right: -40px; animation: drift 26s ease-in-out infinite reverse; }
+    @keyframes drift { 0%,100% { transform: translateX(0); } 50% { transform: translateX(30px); } }
+
+    /* ── Escena principal ── */
+    .scene {
+      position: relative; z-index: 2;
+      display: flex; flex-direction: column; align-items: center;
+      text-align: center; padding: 48px 24px; max-width: 560px;
+    }
+
+    .mascot-wrap { width: min(260px, 60vw); animation: bob 2.6s ease-in-out infinite; }
+    @keyframes bob { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+
+    .tail { transform-origin: 172px 150px; animation: wag .7s ease-in-out infinite alternate; }
+    @keyframes wag { from { transform: rotate(-10deg); } to { transform: rotate(14deg); } }
+
+    .paw-tool { transform-origin: 60px 150px; animation: tap 1.9s ease-in-out infinite; animation-delay: .3s; }
+    @keyframes tap { 0%,60%,100% { transform: rotate(0deg); } 78% { transform: rotate(-24deg); } }
+
+    .halo { transform-origin: 176px 44px; animation: sway 3.2s ease-in-out infinite; }
+    @keyframes sway { 0%,100% { transform: rotate(8deg); } 50% { transform: rotate(-4deg); } }
+
+    .eyebrow {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: var(--sky-l); color: var(--sky); border: 2px solid rgba(37,150,228,.25);
+      font-weight: 800; font-size: .78rem; letter-spacing: .04em; text-transform: uppercase;
+      padding: 7px 18px; border-radius: 50px; margin-top: 18px;
+    }
+
+    h1 {
+      font-family: 'Fredoka One', cursive;
+      font-weight: 400;
+      font-size: clamp(1.7rem, 5vw, 2.5rem);
+      color: var(--dark);
+      margin: 16px 0 10px;
+      line-height: 1.15;
+    }
+
+    p.lead {
+      font-size: clamp(.95rem, 2.4vw, 1.05rem);
+      color: var(--muted);
+      font-weight: 700;
+      line-height: 1.6;
+      max-width: 440px;
+    }
+
+    .cta-row { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; margin-top: 26px; }
+
+    .btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 14px 28px; border-radius: 50px; font-family: 'Nunito', sans-serif;
+      font-weight: 800; font-size: .95rem; text-decoration: none;
+      transition: transform .25s cubic-bezier(.4,0,.2,1), box-shadow .25s;
+      border: 2px solid transparent;
+    }
+    .btn:focus-visible { outline: 3px solid var(--sky); outline-offset: 3px; }
+    .btn--yellow { background: var(--yellow); color: var(--dark); box-shadow: 0 8px 24px rgba(247,198,24,.35); }
+    .btn--yellow:hover { background: var(--yellow-d); transform: translateY(-3px) scale(1.03); }
+    .btn--ghost { background: transparent; color: var(--sky); border-color: var(--sky-l); }
+    .btn--ghost:hover { border-color: var(--sky); transform: translateY(-3px); }
+
+    .brand-tag {
+      margin-top: 34px; font-size: .78rem; font-weight: 800; color: var(--dark);
+      display: flex; align-items: center; gap: 6px; opacity: .7;
+    }
+
+    /* ── Huellitas caminando ── */
+    .trail { position: absolute; inset: 0; pointer-events: none; z-index: 1; }
+    .paw {
+      position: absolute; width: 22px; opacity: 0;
+      fill: var(--sky);
+      animation: pawStep 3.6s ease-in-out infinite;
+    }
+    .paw--1 { left: 8%;  bottom: 18%; animation-delay: 0s;   transform: rotate(-18deg); }
+    .paw--2 { left: 18%; bottom: 30%; animation-delay: .5s;  transform: rotate(-10deg); }
+    .paw--3 { left: 28%; bottom: 42%; animation-delay: 1s;   transform: rotate(-4deg);  }
+    .paw--4 { right: 28%; bottom: 42%; animation-delay: 1.5s; transform: rotate(4deg) scaleX(-1); }
+    .paw--5 { right: 18%; bottom: 30%; animation-delay: 2s;  transform: rotate(10deg) scaleX(-1); }
+    .paw--6 { right: 8%;  bottom: 18%; animation-delay: 2.5s; transform: rotate(18deg) scaleX(-1); }
+    @keyframes pawStep {
+      0% { opacity: 0; transform: translateY(6px) scale(.7) rotate(var(--r, 0deg)); }
+      15% { opacity: .55; transform: translateY(0) scale(1) rotate(var(--r, 0deg)); }
+      70% { opacity: .55; }
+      100% { opacity: 0; }
+    }
+
+    @media (max-width: 480px) {
+      .trail { display: none; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .tape--top, .tape--bottom, .cloud--1, .cloud--2, .mascot-wrap, .tail, .paw-tool, .halo, .paw {
+        animation: none !important;
+      }
+      .paw { opacity: .4; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="tape tape--top"></div>
+  <div class="tape tape--bottom"></div>
+  <div class="cloud cloud--1"></div>
+  <div class="cloud cloud--2"></div>
+
+  <div class="trail" aria-hidden="true">
+    <svg class="paw paw--1" viewBox="0 0 100 100"><ellipse cx="50" cy="62" rx="26" ry="22"/><ellipse cx="20" cy="30" rx="12" ry="15"/><ellipse cx="45" cy="16" rx="12" ry="15"/><ellipse cx="72" cy="20" rx="11" ry="14"/><ellipse cx="88" cy="42" rx="10" ry="13"/></svg>
+    <svg class="paw paw--2" viewBox="0 0 100 100"><ellipse cx="50" cy="62" rx="26" ry="22"/><ellipse cx="20" cy="30" rx="12" ry="15"/><ellipse cx="45" cy="16" rx="12" ry="15"/><ellipse cx="72" cy="20" rx="11" ry="14"/><ellipse cx="88" cy="42" rx="10" ry="13"/></svg>
+    <svg class="paw paw--3" viewBox="0 0 100 100"><ellipse cx="50" cy="62" rx="26" ry="22"/><ellipse cx="20" cy="30" rx="12" ry="15"/><ellipse cx="45" cy="16" rx="12" ry="15"/><ellipse cx="72" cy="20" rx="11" ry="14"/><ellipse cx="88" cy="42" rx="10" ry="13"/></svg>
+    <svg class="paw paw--4" viewBox="0 0 100 100"><ellipse cx="50" cy="62" rx="26" ry="22"/><ellipse cx="20" cy="30" rx="12" ry="15"/><ellipse cx="45" cy="16" rx="12" ry="15"/><ellipse cx="72" cy="20" rx="11" ry="14"/><ellipse cx="88" cy="42" rx="10" ry="13"/></svg>
+    <svg class="paw paw--5" viewBox="0 0 100 100"><ellipse cx="50" cy="62" rx="26" ry="22"/><ellipse cx="20" cy="30" rx="12" ry="15"/><ellipse cx="45" cy="16" rx="12" ry="15"/><ellipse cx="72" cy="20" rx="11" ry="14"/><ellipse cx="88" cy="42" rx="10" ry="13"/></svg>
+    <svg class="paw paw--6" viewBox="0 0 100 100"><ellipse cx="50" cy="62" rx="26" ry="22"/><ellipse cx="20" cy="30" rx="12" ry="15"/><ellipse cx="45" cy="16" rx="12" ry="15"/><ellipse cx="72" cy="20" rx="11" ry="14"/><ellipse cx="88" cy="42" rx="10" ry="13"/></svg>
+  </div>
+
+  <main class="scene">
+    <div class="mascot-wrap">
+      <svg viewBox="0 0 240 220" xmlns="http://www.w3.org/2000/svg">
+        <!-- halo, ladeada como si se la hubiera quitado para trabajar -->
+        <g class="halo">
+          <ellipse cx="176" cy="40" rx="26" ry="9" fill="none" stroke="#2596e4" stroke-width="5"/>
+        </g>
+
+        <!-- cola -->
+        <g class="tail">
+          <path d="M172 150 C 205 140, 212 108, 190 92 C 208 112, 202 142, 172 156 Z" fill="#FFFCF5" stroke="#1A1A2E" stroke-width="4" stroke-linejoin="round"/>
+        </g>
+
+        <!-- cuerpo / hombros -->
+        <path d="M60 220 C 55 150, 90 122, 120 122 C 150 122, 185 150, 180 220 Z" fill="#FFFCF5" stroke="#1A1A2E" stroke-width="5" stroke-linejoin="round"/>
+
+        <!-- orejas -->
+        <path d="M58 88 C 30 72, 26 40, 46 26 C 52 56, 62 74, 78 90 Z" fill="#1A1A2E"/>
+        <path d="M182 88 C 210 72, 214 40, 194 26 C 188 56, 178 74, 162 90 Z" fill="#1A1A2E"/>
+
+        <!-- cabeza -->
+        <circle cx="120" cy="100" r="62" fill="#FFFCF5" stroke="#1A1A2E" stroke-width="5"/>
+
+        <!-- cachetes -->
+        <ellipse cx="82" cy="118" rx="14" ry="9" fill="#FFB3C6" opacity=".85"/>
+        <ellipse cx="158" cy="118" rx="14" ry="9" fill="#FFB3C6" opacity=".85"/>
+
+        <!-- ojos -->
+        <circle cx="98" cy="96" r="7" fill="#1A1A2E"/>
+        <circle cx="142" cy="96" r="7" fill="#1A1A2E"/>
+        <circle cx="100.5" cy="93.5" r="2.2" fill="#fff"/>
+        <circle cx="144.5" cy="93.5" r="2.2" fill="#fff"/>
+
+        <!-- hocico -->
+        <ellipse cx="120" cy="118" rx="16" ry="11" fill="#fff"/>
+        <ellipse cx="120" cy="112" rx="6.5" ry="5" fill="#1A1A2E"/>
+        <path d="M120 118 Q 120 126 112 129 M120 118 Q 120 126 128 129" stroke="#1A1A2E" stroke-width="3" fill="none" stroke-linecap="round"/>
+
+        <!-- casco de construcción -->
+        <g>
+          <path d="M64 78 C 64 42, 176 42, 176 78 L 176 84 L 64 84 Z" fill="#F7C618" stroke="#1A1A2E" stroke-width="5" stroke-linejoin="round"/>
+          <rect x="58" y="78" width="124" height="14" rx="7" fill="#E0B015" stroke="#1A1A2E" stroke-width="5"/>
+          <circle cx="120" cy="52" r="5" fill="#1A1A2E"/>
+        </g>
+
+        <!-- pata con llave -->
+        <g class="paw-tool">
+          <ellipse cx="52" cy="150" rx="17" ry="14" fill="#FFFCF5" stroke="#1A1A2E" stroke-width="4"/>
+          <g transform="translate(18,124) rotate(-18)">
+            <rect x="0" y="8" width="34" height="8" rx="4" fill="#2596e4" stroke="#1A1A2E" stroke-width="3"/>
+            <circle cx="4" cy="12" r="9" fill="none" stroke="#2596e4" stroke-width="6"/>
+          </g>
+        </g>
+      </svg>
+    </div>
+
+    <span class="eyebrow">🐾 Volvemos pronto</span>
+    <h1>¡Nos pusimos el casco un rato!</h1>
+    <p class="lead">Estamos mejorando la tienda para que pedir tus gomitas sea aún más fácil. Mientras tanto, escríbenos y coordinamos tu pedido directo.</p>
+
+    <div class="cta-row">
+      <a class="btn btn--yellow" href="https://wa.me/51913897717?text=%C2%A1Hola%20Santa%20Patita!%20%F0%9F%90%BE%20Vi%20que%20est%C3%A1n%20en%20mantenimiento%2C%20quiero%20hacer%20un%20pedido." target="_blank" rel="noopener">💬 Pedir por WhatsApp</a>
+      <a class="btn btn--ghost" href="https://www.instagram.com/santa.patita/" target="_blank" rel="noopener">📸 @santa.patita</a>
+    </div>
+
+    <div class="brand-tag">🐾 Santa Patita — Suplemento de colágeno natural para perros</div>
+  </main>
+
+</body>
+</html>
