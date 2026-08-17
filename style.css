@@ -515,6 +515,34 @@ a { text-decoration: none; color: inherit; }
 .summary-row--total strong { color: var(--sky-d); font-size: 1.3rem; font-family: 'Fredoka One', cursive; }
 .order-note { text-align: center; font-size: .8rem; color: var(--muted); margin-top: 12px; font-weight: 700; }
 
+/* Selector de método de pago — mismo peso visual para las 3 opciones */
+.pay-options-label { font-size: .82rem; font-weight: 800; color: var(--dark); margin: 18px 0 10px; text-align: center; }
+.pay-options { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.pay-option {
+  display: flex; flex-direction: column; align-items: center; gap: 6px;
+  padding: 16px 8px; border-radius: var(--radius); border: 3px solid #eef2f7;
+  background: white; cursor: pointer; font-weight: 800; font-size: .82rem;
+  color: var(--dark); transition: var(--t); text-align: center;
+}
+.pay-option:hover { transform: translateY(-3px); box-shadow: var(--shadow); }
+.pay-option__icon { font-size: 1.6rem; }
+.pay-option--card:hover { border-color: var(--yellow-d); }
+.pay-option--yape:hover { border-color: #7c3aed; }
+.pay-option--wa:hover   { border-color: #25D366; }
+
+/* Modal Yape/Plin — cuentas distintas (números distintos), una fila cada una */
+.yape-qr-box { text-align: center; background: var(--sky-l); border-radius: var(--radius); padding: 18px; }
+.yape-account-row { padding: 10px 0; }
+.yape-account-row + .yape-account-row { border-top: 1px dashed rgba(37,150,228,.3); }
+.yape-qr-img { max-width: 120px; margin: 0 auto 8px; border-radius: 12px; }
+.yape-number-row { display: flex; align-items: center; justify-content: center; gap: 10px; font-size: .95rem; font-weight: 700; color: var(--dark); flex-wrap: wrap; }
+.yape-number-row strong { font-size: 1.05rem; }
+.yape-amount { margin-top: 10px; font-size: .95rem; color: var(--dark); }
+.yape-amount strong { color: var(--sky-d); font-size: 1.15rem; }
+.yape-proof-toggle { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.yape-proof-btn { justify-content: center; font-size: .8rem; padding: 10px; }
+.yape-proof-btn.is-active { border-color: var(--sky); color: var(--sky-d); background: var(--sky-l); }
+
 /* Carrito de sabores */
 .cart-list { display: flex; flex-direction: column; gap: 10px; }
 .cart-item {
@@ -674,6 +702,8 @@ a { text-decoration: none; color: inherit; }
   .sizes-grid      { grid-template-columns: 1fr; }
   .delivery-types  { grid-template-columns: 1fr; }
   .delivery-info   { grid-template-columns: 1fr; }
+  .pay-options     { grid-template-columns: 1fr; }
+  .yape-proof-toggle { grid-template-columns: 1fr; }
   .order-builder   { padding: 28px 20px; border-radius: 24px; }
   .benefits__grid  { grid-template-columns: 1fr; }
   .stores-grid     { grid-template-columns: 1fr 1fr; }

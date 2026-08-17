@@ -23,8 +23,10 @@
     safeTrack('AddToCart', { content_ids: [id], content_name: name, value: Number(value) || 0.01, currency: 'PEN' });
   };
 
-  window.trackInitiateCheckout = function (value, numItems, contentIds) {
-    safeTrack('InitiateCheckout', { value: Number(value) || 0.01, currency: 'PEN', num_items: numItems, content_ids: contentIds });
+  // extra: parámetros adicionales (ej. { content_category: 'whatsapp' }) para
+  // distinguir el canal elegido sin fragmentar el evento estándar en Events Manager.
+  window.trackInitiateCheckout = function (value, numItems, contentIds, extra) {
+    safeTrack('InitiateCheckout', { value: Number(value) || 0.01, currency: 'PEN', num_items: numItems, content_ids: contentIds, ...(extra || {}) });
   };
 
   const FIRED_KEY_PREFIX = 'fb_purchase_fired_';

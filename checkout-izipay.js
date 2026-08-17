@@ -1,49 +1,19 @@
 // Checkout con tarjeta (Izipay / Krypton). Requiere que la página ya defina
-// `cart`, `cartSubtotal()` y el input #deliveryDate (ver index.html / tienda.html).
+// `cart`, `cartSubtotal()`, el input #deliveryDate y customer-storage.js
+// (ver index.html / tienda.html).
 (function () {
   const KRYPTON_JS_URL = 'https://static.micuentaweb.pe/static/js/krypton-client/V4.0/stable/kr-payment-form.min.js';
   const KRYPTON_CSS_URL = 'https://static.micuentaweb.pe/static/js/krypton-client/V4.0/ext/classic.css';
   const WHATSAPP_NUMBER = '51913897717';
-  const CUSTOMER_STORAGE_KEY = 'santapatita_customer';
 
   let krLoadPromise = null;
   let submitHandlersAttached = false;
   let lastOrderId = null;
   let lastAmount = null;
 
-  // ── Recordar datos del cliente (nombre/email/tel/dirección/distrito) ──
-  function saveCustomerData(data) {
-    try { localStorage.setItem(CUSTOMER_STORAGE_KEY, JSON.stringify(data)); } catch (e) {}
-  }
-
-  function restoreCustomerData() {
-    let saved;
-    try { saved = JSON.parse(localStorage.getItem(CUSTOMER_STORAGE_KEY) || 'null'); } catch (e) { saved = null; }
-    if (!saved) return;
-
-    const addressEl = document.getElementById('deliveryAddress');
-    const districtEl = document.getElementById('districtSelect');
-    if (addressEl && !addressEl.value && saved.address) {
-      addressEl.value = saved.address;
-      // La dirección guardada viaja junto con el pin que el cliente confirmó la
-      // última vez — sin esto, el campo se rellena pero el mapa queda "vacío"
-      // (sin lat/lng) y el cliente tiene que volver a ubicar el pin de cero.
-      const latEl = document.getElementById('deliveryLat');
-      const lngEl = document.getElementById('deliveryLng');
-      if (latEl && saved.lat) latEl.value = saved.lat;
-      if (lngEl && saved.lng) lngEl.value = saved.lng;
-    }
-    if (districtEl && !districtEl.value && saved.district) districtEl.value = saved.district;
-
-    const firstNameEl = document.getElementById('izipayFirstName');
-    const lastNameEl = document.getElementById('izipayLastName');
-    const emailEl = document.getElementById('izipayEmail');
-    const phoneEl = document.getElementById('izipayPhone');
-    if (firstNameEl && !firstNameEl.value && saved.firstName) firstNameEl.value = saved.firstName;
-    if (lastNameEl && !lastNameEl.value && saved.lastName) lastNameEl.value = saved.lastName;
-    if (emailEl && !emailEl.value && saved.email) emailEl.value = saved.email;
-    if (phoneEl && !phoneEl.value && saved.phone) phoneEl.value = saved.phone;
-  }
+  const IZIPAY_FIELD_IDS = { firstName: 'izipayFirstName', lastName: 'izipayLastName', email: 'izipayEmail', phone: 'izipayPhone' };
+  function saveCustomerData(data) { window.SantaPatitaCustomer.save(data); }
+  function restoreCustomerData() { window.SantaPatitaCustomer.restore(IZIPAY_FIELD_IDS); }
 
   function loadKrypton(publicKey) {
     if (krLoadPromise) return krLoadPromise;

@@ -285,12 +285,18 @@
             <strong id="sumTotal">S/ —</strong>
           </div>
         </div>
-        <button class="btn btn--yellow btn--lg btn--full" id="cardPayBtn" onclick="openIzipayCheckout()">
-          💳 Pagar con tarjeta
-        </button>
-        <button class="btn btn--secondary btn--full" id="orderBtn" onclick="sendOrder()" style="margin-top:10px;">
-          🛒 O coordina por WhatsApp
-        </button>
+        <div class="pay-options-label">Elige cómo pagar</div>
+        <div class="pay-options">
+          <button type="button" class="pay-option pay-option--card" id="cardPayBtn" onclick="openIzipayCheckout()">
+            <span class="pay-option__icon">💳</span><span>Tarjeta</span>
+          </button>
+          <button type="button" class="pay-option pay-option--yape" id="yapePayBtn" onclick="openYapeCheckout()">
+            <span class="pay-option__icon">📱</span><span>Yape / Plin</span>
+          </button>
+          <button type="button" class="pay-option pay-option--wa" id="orderBtn" onclick="sendOrder()">
+            <span class="pay-option__icon">🟢</span><span>WhatsApp</span>
+          </button>
+        </div>
       </div>
 
     </div>
@@ -698,6 +704,12 @@ function sendOrder() {
   const deliveryFee = deliveryType === 'delivery' ? computeDeliveryFee(deliveryType, districtSelect.value, dateInput.value, subtotal) : 0;
   const total = subtotal + deliveryFee;
 
+  if (typeof trackInitiateCheckout === 'function') {
+    const numItems = cart.reduce((sum, i) => sum + i.qty, 0);
+    const ids = cart.map((i) => fbSlug(i.flavor) + '-' + i.units + 'u');
+    trackInitiateCheckout(subtotal, numItems, ids, { content_category: 'whatsapp' });
+  }
+
   let msg = `¡Hola Santa Patita! 🐾 Quiero hacer un pedido:\n\n`;
   msg += `🍖 *Pedido:*\n`;
   cart.forEach(item => {
@@ -748,6 +760,8 @@ document.querySelectorAll('.benefit-card,.store-card,.delivery-box,.flavor-card,
 restoreCart();
 </script>
 <script src="delivery-map.js"></script>
+<script src="customer-storage.js"></script>
 <script src="checkout-izipay.js"></script>
+<script src="checkout-yape.js"></script>
 </body>
 </html>
