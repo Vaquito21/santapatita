@@ -1,6 +1,4 @@
 {
-  "routes": [
-    { "src": "/api/(.*)", "dest": "/api/$1" },
-    { "src": "/(.*)", "dest": "/maintenance.html" }
-  ]
+  "cleanUrls": true,
+  "trailingSlash": false
 }
